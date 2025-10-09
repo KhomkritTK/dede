@@ -6,7 +6,6 @@ import (
 
 	"eservice-backend/config"
 	"eservice-backend/database"
-	"eservice-backend/database/migrations"
 	"eservice-backend/router"
 	"eservice-backend/server"
 
@@ -21,11 +20,6 @@ func main() {
 	db, err := database.InitDB(cfg)
 	if err != nil {
 		log.Fatal("Failed to initialize database:", err)
-	}
-
-	// Run migrations
-	if err := migrations.Migrate(db); err != nil {
-		log.Fatal("Failed to run migrations:", err)
 	}
 
 	// Initialize Gin router

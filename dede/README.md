@@ -41,6 +41,10 @@ eservice-backend/
 │   │   └── migrations.go           # Database migrations
 │   └── seed.go                     # Seed ข้อมูลตั้งต้น
 │
+├── cmd/
+│   └── migrate/
+│       └── main.go                 # Migration runner
+│
 ├── middleware/
 │   ├── auth_middleware.go          # JWT authentication
 │   ├── cors_middleware.go          # CORS handling
@@ -98,14 +102,34 @@ cp .env.example .env
 - ตั้งค่า JWT secret
 - ตั้งค่า email (ถ้าต้องการใช้ระบบแจ้งเตือนทางอีเมล)
 
-5. รันโปรเจกต์:
+5. รัน database migrations:
+```bash
+make migrate
+```
+หรือ
+```bash
+go run cmd/migrate/main.go
+```
+
+6. รันโปรเจกต์:
+```bash
+make run
+```
+หรือ
 ```bash
 go run main.go
 ```
 
-หรือสำหรับการพัฒนา:
+### การใช้ Makefile
+
+โปรเจกต์นี้มี Makefile สำหรับความสะดวกในการพัฒนา:
+
 ```bash
-go run main.go
+make help        # แสดงคำสั่งทั้งหมด
+make build       # Build โปรเจกต์
+make run         # Build และรันโปรเจกต์
+make migrate     # รัน database migrations
+make clean       # ลบไฟล์ build
 ```
 
 ## API Documentation
@@ -200,8 +224,17 @@ go run main.go
 ### การเพิ่ม Model ใหม่
 
 1. สร้าง Go struct ใน `models/` folder
-2. เพิ่ม model ใน migrations
-3. สร้าง repository และ service ตามต้องการ
+2. เพิ่ม model ใน `database/migrations/migrations.go`
+3. รัน migrations: `make migrate`
+4. สร้าง repository และ service ตามต้องการ
+
+### การจัดการ Database Migrations
+
+การ migrations ถูกแยกออกจาก main application เพื่อความยืดหยุ่นในการจัดการ:
+
+- รัน migrations: `make migrate` หรือ `go run cmd/migrate/main.go`
+- ไฟล์ migration อยู่ที่: `database/migrations/migrations.go`
+- สามารถเพิ่ม model ใหม่ใน migrations function แล้วรันคำสั่ง migration ใหม่
 
 ## License
 
