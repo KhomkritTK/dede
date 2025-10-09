@@ -11,10 +11,9 @@ import (
 func AdminRoutes(r *gin.RouterGroup, db *gorm.DB, cfg *config.Config) {
 	authHandler := handler.NewAuthHandler(db, cfg)
 
-	// Authentication routes
+	// Protected authentication routes (these require authentication)
 	auth := r.Group("/auth")
 	{
-		auth.POST("/login", authHandler.Login)
 		auth.POST("/logout", authHandler.Logout)
 		auth.POST("/refresh", authHandler.RefreshToken)
 	}

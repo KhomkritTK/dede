@@ -22,7 +22,6 @@ func NotificationRoutes(r *gin.RouterGroup, db *gorm.DB, cfg *config.Config) {
 		// Notification actions
 		notifications.POST("/:id/mark-read", notificationHandler.MarkAsRead)
 		notifications.POST("/my/mark-all-read", notificationHandler.MarkAllAsRead)
-		notifications.POST("/send", notificationHandler.SendNotifications)
 
 		// My notifications (for current user)
 		notifications.GET("/my", notificationHandler.GetMyNotifications)
