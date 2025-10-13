@@ -1,11 +1,9 @@
 {
+  "/not-found": "app/not-found.js",
   "/eservice/dede/page": "app/eservice/dede/page.js",
   "/eservice/dede/services/page": "app/eservice/dede/services/page.js",
   "/eservice/dede/about/page": "app/eservice/dede/about/page.js",
-  "/eservice/dede/dashboard/page": "app/eservice/dede/dashboard/page.js",
   "/eservice/dede/contact/page": "app/eservice/dede/contact/page.js",
-  "/login/page": "app/login/page.js",
-  "/eservice/dede/home/page": "app/eservice/dede/home/page.js",
-  "/eservice/dede/license/new/page": "app/eservice/dede/license/new/page.js",
-  "/eservice/dede/license/renewal/page": "app/eservice/dede/license/renewal/page.js"
+  "/eservice/dede/dashboard/page": "app/eservice/dede/dashboard/page.js",
+  "/eservice/dede/home/page": "app/eservice/dede/home/page.js"
 }
