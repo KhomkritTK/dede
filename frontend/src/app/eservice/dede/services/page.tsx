@@ -54,30 +54,6 @@ export default function ServicesPage() {
       ),
       color: 'from-red-500 to-red-600',
       link: '/eservice/dede/license/reduction'
-    },
-    {
-      id: 5,
-      title: 'ติดตามสถานะคำขอ',
-      description: 'ติดตามสถานะคำขอและการดำเนินการต่างๆ แบบ real-time',
-      icon: (
-        <svg className="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-        </svg>
-      ),
-      color: 'from-purple-500 to-purple-600',
-      link: '/eservice/dede/dashboard'
-    },
-    {
-      id: 6,
-      title: 'ดาวน์โหลดเอกสารและคู่มือ',
-      description: 'ดาวน์โหลดเอกสาร คู่มือ และแบบฟอร์มที่เกี่ยวข้องกับพลังงานทดแทน',
-      icon: (
-        <svg className="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      ),
-      color: 'from-indigo-500 to-indigo-600',
-      link: '#'
     }
   ]
 
@@ -193,7 +169,7 @@ export default function ServicesPage() {
       {/* Services Grid */}
       <div className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-2">
             {services.map((service) => (
               <div key={service.id} className="bg-white overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow duration-300">
                 <div className="p-6">
