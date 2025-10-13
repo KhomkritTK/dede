@@ -16,20 +16,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/eservice/dede/page.js"
     ],
-    "/login/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/login/page.js"
-    ],
     "/eservice/dede/services/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/eservice/dede/services/page.js"
-    ],
-    "/eservice/dede/home/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/eservice/dede/home/page.js"
     ],
     "/eservice/dede/about/page": [
       "static/chunks/webpack.js",
@@ -41,10 +31,30 @@
       "static/chunks/main-app.js",
       "static/chunks/app/eservice/dede/contact/page.js"
     ],
-    "/register/page": [
+    "/eservice/dede/dashboard/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/register/page.js"
+      "static/chunks/app/eservice/dede/dashboard/page.js"
+    ],
+    "/login/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/login/page.js"
+    ],
+    "/eservice/dede/home/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/eservice/dede/home/page.js"
+    ],
+    "/eservice/dede/license/new/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/eservice/dede/license/new/page.js"
+    ],
+    "/eservice/dede/license/renewal/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/eservice/dede/license/renewal/page.js"
     ]
   }
 }

@@ -1,8 +1,8 @@
-// File: /Users/cms-rd-1/Documents/GitHub/dede/frontend/src/app/register/page.tsx
-import * as entry from '../../../../src/app/register/page.js'
+// File: /Users/cms-rd-1/Documents/GitHub/dede/frontend/src/app/eservice/dede/dashboard/page.tsx
+import * as entry from '../../../../../../src/app/eservice/dede/dashboard/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
-type TEntry = typeof import('../../../../src/app/register/page.js')
+type TEntry = typeof import('../../../../../../src/app/eservice/dede/dashboard/page.js')
 
 // Check that the entry is a valid entry
 checkFields<Diff<{

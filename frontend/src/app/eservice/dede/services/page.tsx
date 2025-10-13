@@ -9,69 +9,75 @@ export default function ServicesPage() {
   const services = [
     {
       id: 1,
-      title: 'คำขอใบอนุญาตผลิตไฟฟ้าจากพลังงานทดแทน',
-      description: 'ยื่นคำขอใบอนุญาตสำหรับการติดตั้งและดำเนินการโรงไฟฟ้าพลังงานทดแทน',
+      title: 'ขอรับใบอนุญาตใหม่',
+      description: 'ยื่นคำขอรับใบอนุญาตสำหรับการติดตั้งและดำเนินการโรงไฟฟ้าพลังงานทดแทน',
       icon: (
-        <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        <svg className="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
       ),
-      link: '/login'
+      color: 'from-green-500 to-green-600',
+      link: '/eservice/dede/license/new'
     },
     {
       id: 2,
-      title: 'คำขอใบอนุญาตสนับสนุนโครงการพลังงานทดแทน',
-      description: 'ยื่นคำขอสนับสนุนสำหรับโครงการพลังงานทดแทนขนาดเล็กและขนาดกลาง',
+      title: 'ขอต่ออายุใบอนุญาต',
+      description: 'ยื่นคำขอต่ออายุใบอนุญาตสำหรับโครงการพลังงานทดแทนที่มีอยู่แล้ว',
       icon: (
-        <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+        <svg className="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       ),
-      link: '/login'
+      color: 'from-blue-500 to-blue-600',
+      link: '/eservice/dede/license/renewal'
     },
     {
       id: 3,
-      title: 'ติดตามสถานะคำขอ',
-      description: 'ติดตามสถานะคำขอและการดำเนินการต่างๆ แบบ real-time',
+      title: 'ขอขยายการผลิต',
+      description: 'ยื่นคำขอขยายกำลังการผลิตสำหรับโครงการพลังงานทดแทนที่มีอยู่แล้ว',
       icon: (
-        <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+        <svg className="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
         </svg>
       ),
-      link: '/login'
+      color: 'from-yellow-500 to-yellow-600',
+      link: '/eservice/dede/license/extension'
     },
     {
       id: 4,
-      title: 'ดาวน์โหลดเอกสารและคู่มือ',
-      description: 'ดาวน์โหลดเอกสาร คู่มือ และแบบฟอร์มที่เกี่ยวข้องกับพลังงานทดแทน',
+      title: 'ขอลดการผลิต',
+      description: 'ยื่นคำขอลดกำลังการผลิตสำหรับโครงการพลังงานทดแทนที่มีอยู่แล้ว',
       icon: (
-        <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        <svg className="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
         </svg>
       ),
-      link: '#'
+      color: 'from-red-500 to-red-600',
+      link: '/eservice/dede/license/reduction'
     },
     {
       id: 5,
-      title: 'นัดหมายเจ้าหน้าที่ตรวจสอบ',
-      description: 'นัดหมายเจ้าหน้าที่เพื่อตรวจสอบสถานที่ติดตั้งพลังงานทดแทน',
+      title: 'ติดตามสถานะคำขอ',
+      description: 'ติดตามสถานะคำขอและการดำเนินการต่างๆ แบบ real-time',
       icon: (
-        <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        <svg className="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
         </svg>
       ),
-      link: '/login'
+      color: 'from-purple-500 to-purple-600',
+      link: '/eservice/dede/dashboard'
     },
     {
       id: 6,
-      title: 'ติดต่อเจ้าหน้าที่',
-      description: 'ติดต่อเจ้าหน้าที่เพื่อขอคำปรึกษาและข้อมูลเพิ่มเติม',
+      title: 'ดาวน์โหลดเอกสารและคู่มือ',
+      description: 'ดาวน์โหลดเอกสาร คู่มือ และแบบฟอร์มที่เกี่ยวข้องกับพลังงานทดแทน',
       icon: (
-        <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <svg className="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
       ),
-      link: '/eservice/dede/contact'
+      color: 'from-indigo-500 to-indigo-600',
+      link: '#'
     }
   ]
 
