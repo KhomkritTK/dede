@@ -11,7 +11,7 @@ interface LoginFormData {
 }
 
 export default function LoginPage() {
-  const { login, isAuthenticated, isLoading } = useAuth()
+  const { login, isAuthenticated, isLoading, user } = useAuth()
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   
@@ -24,9 +24,18 @@ export default function LoginPage() {
   useEffect(() => {
     // Only redirect if not loading and authenticated
     if (!isLoading && isAuthenticated) {
-      router.push('/dashboard')
+      // Redirect based on user role
+      if (user?.role === 'admin' ||
+          user?.role === 'dede_head' ||
+          user?.role === 'dede_staff' ||
+          user?.role === 'dede_consult' ||
+          user?.role === 'auditor') {
+        router.push('/eservice/dede/officer/dashboard')
+      } else {
+        router.push('/eservice/dede')
+      }
     }
-  }, [isAuthenticated, isLoading, router])
+  }, [isAuthenticated, isLoading, router, user])
 
   const onSubmit = async (data: LoginFormData) => {
     setError(null)
