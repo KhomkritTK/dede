@@ -1,0 +1,11 @@
+{
+  "/not-found": "app/not-found.js",
+  "/page": "app/page.js",
+  "/login/page": "app/login/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/dashboard/licenses/page": "app/dashboard/licenses/page.js",
+  "/dashboard/inspections/page": "app/dashboard/inspections/page.js",
+  "/dashboard/audits/page": "app/dashboard/audits/page.js",
+  "/dashboard/notifications/page": "app/dashboard/notifications/page.js",
+  "/dashboard/profile/page": "app/dashboard/profile/page.js"
+}
