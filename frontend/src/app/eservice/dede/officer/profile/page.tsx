@@ -8,12 +8,11 @@ export default function OfficerProfilePage() {
   const { user } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
+    fullName: user?.fullName || '',
     email: user?.email || '',
     phone: user?.phone || '',
-    position: user?.position || '',
-    department: user?.department || '',
+    company: user?.company || '',
+    address: user?.address || '',
   })
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,7 +31,7 @@ export default function OfficerProfilePage() {
   }
 
   return (
-    <div>
+    <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">โปรไฟล์ผู้ใช้งาน</h1>
         <p className="mt-1 text-sm text-gray-600">
@@ -56,30 +55,15 @@ export default function OfficerProfilePage() {
 
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div>
-                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-                  ชื่อ
+              <div className="sm:col-span-2">
+                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
+                  ชื่อ-นามสกุล
                 </label>
                 <input
                   type="text"
-                  name="firstName"
-                  id="firstName"
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                  disabled={!isEditing}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-                  นามสกุล
-                </label>
-                <input
-                  type="text"
-                  name="lastName"
-                  id="lastName"
-                  value={formData.lastName}
+                  name="fullName"
+                  id="fullName"
+                  value={formData.fullName}
                   onChange={handleInputChange}
                   disabled={!isEditing}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
@@ -116,30 +100,30 @@ export default function OfficerProfilePage() {
                 />
               </div>
 
-              <div>
-                <label htmlFor="position" className="block text-sm font-medium text-gray-700">
-                  ตำแหน่ง
+              <div className="sm:col-span-2">
+                <label htmlFor="company" className="block text-sm font-medium text-gray-700">
+                  บริษัท/หน่วยงาน
                 </label>
                 <input
                   type="text"
-                  name="position"
-                  id="position"
-                  value={formData.position}
+                  name="company"
+                  id="company"
+                  value={formData.company}
                   onChange={handleInputChange}
                   disabled={!isEditing}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
                 />
               </div>
 
-              <div>
-                <label htmlFor="department" className="block text-sm font-medium text-gray-700">
-                  แผนก
+              <div className="sm:col-span-2">
+                <label htmlFor="address" className="block text-sm font-medium text-gray-700">
+                  ที่อยู่
                 </label>
                 <input
                   type="text"
-                  name="department"
-                  id="department"
-                  value={formData.department}
+                  name="address"
+                  id="address"
+                  value={formData.address}
                   onChange={handleInputChange}
                   disabled={!isEditing}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"

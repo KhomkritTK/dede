@@ -1,9 +1,57 @@
 import { apiClient } from './api'
-import { User, LoginCredentials, RegisterData, ApiResponse } from '@/types'
+import {
+  User,
+  LoginCredentials,
+  LoginWithOTPCredentials,
+  RegisterData,
+  RegisterWithOTPData,
+  CorporateRegisterData,
+  AcceptInvitationData,
+  RegisterCorporateMemberData,
+  SendOTPData,
+  VerifyOTPData,
+  ResendOTPData,
+  ForgotPasswordData,
+  ResetPasswordData,
+  ChangePasswordData,
+  VerifyOTPResponse,
+  ApiResponse
+} from '@/types'
 
 export class AuthService {
   async login(credentials: LoginCredentials): Promise<ApiResponse<{ user: User; token: string }>> {
     const response = await apiClient.post<{ user: User; access_token: string; refresh_token: string }>('/api/v1/auth/login', credentials)
+    
+    if (response.success && response.data) {
+      // Store token and user in localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('token', response.data.access_token)
+        localStorage.setItem('refreshToken', response.data.refresh_token)
+        localStorage.setItem('user', JSON.stringify(response.data.user))
+      }
+      
+      // Transform the response to match the expected format
+      const transformedResponse: ApiResponse<{ user: User; token: string }> = {
+        success: response.success,
+        message: response.message,
+        data: {
+          user: response.data.user,
+          token: response.data.access_token
+        }
+      }
+      
+      return transformedResponse
+    }
+    
+    // Return error response as is
+    return {
+      success: response.success,
+      message: response.message
+    }
+  }
+
+  async loginWithOTP(credentials: LoginWithOTPCredentials): Promise<ApiResponse<{ user: User; token: string }>> {
+    const response = await apiClient.post<{ user: User; access_token: string; refresh_token: string }>('/api/v1/auth/login-otp', credentials)
     
     if (response.success && response.data) {
       // Store token and user in localStorage
@@ -82,6 +130,76 @@ export class AuthService {
     }
   }
 
+  async registerWithOTP(data: RegisterWithOTPData): Promise<ApiResponse<{ user: User; token: string }>> {
+    const response = await apiClient.post<{ user: User; access_token: string; refresh_token: string }>('/api/v1/auth/register-otp', data)
+    
+    if (response.success && response.data) {
+      // Store token and user in localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('token', response.data.access_token)
+        localStorage.setItem('refreshToken', response.data.refresh_token)
+        localStorage.setItem('user', JSON.stringify(response.data.user))
+      }
+      
+      // Transform the response to match the expected format
+      const transformedResponse: ApiResponse<{ user: User; token: string }> = {
+        success: response.success,
+        message: response.message,
+        data: {
+          user: response.data.user,
+          token: response.data.access_token
+        }
+      }
+      
+      return transformedResponse
+    }
+    
+    // Return error response as is
+    return {
+      success: response.success,
+      message: response.message
+    }
+  }
+
+  async registerCorporate(data: CorporateRegisterData): Promise<ApiResponse<void>> {
+    return await apiClient.post<void>('/api/v1/auth/register-corporate', data)
+  }
+
+  async acceptInvitation(data: AcceptInvitationData): Promise<ApiResponse<{ user: User; token: string }>> {
+    const response = await apiClient.post<{ user: User; access_token: string; refresh_token: string }>('/api/v1/auth/accept-invitation', data)
+    
+    if (response.success && response.data) {
+      // Store token and user in localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('token', response.data.access_token)
+        localStorage.setItem('refreshToken', response.data.refresh_token)
+        localStorage.setItem('user', JSON.stringify(response.data.user))
+      }
+      
+      // Transform the response to match the expected format
+      const transformedResponse: ApiResponse<{ user: User; token: string }> = {
+        success: response.success,
+        message: response.message,
+        data: {
+          user: response.data.user,
+          token: response.data.access_token
+        }
+      }
+      
+      return transformedResponse
+    }
+    
+    // Return error response as is
+    return {
+      success: response.success,
+      message: response.message
+    }
+  }
+
+  async registerCorporateMember(data: RegisterCorporateMemberData): Promise<ApiResponse<void>> {
+    return await apiClient.post<void>('/api/v1/auth/register-corporate-member', data)
+  }
+
   async refreshToken(): Promise<ApiResponse<{ token: string }>> {
     const response = await apiClient.post<{ token: string }>('/api/v1/auth/refresh')
     
@@ -112,8 +230,37 @@ export class AuthService {
     return response
   }
 
-  async changePassword(data: { currentPassword: string; newPassword: string }): Promise<ApiResponse<void>> {
+  async changePassword(data: ChangePasswordData): Promise<ApiResponse<void>> {
     return await apiClient.put<void>('/api/v1/auth/password', data)
+  }
+
+  async forgotPassword(data: ForgotPasswordData): Promise<ApiResponse<void>> {
+    return await apiClient.post<void>('/api/v1/auth/forgot-password', data)
+  }
+
+  async resetPassword(data: ResetPasswordData): Promise<ApiResponse<void>> {
+    return await apiClient.post<void>('/api/v1/auth/reset-password', data)
+  }
+
+  // OTP methods
+  async sendOTP(data: SendOTPData): Promise<ApiResponse<void>> {
+    return await apiClient.post<void>('/api/v1/otp/send', data)
+  }
+
+  async verifyOTP(data: VerifyOTPData): Promise<ApiResponse<VerifyOTPResponse>> {
+    return await apiClient.post<VerifyOTPResponse>('/api/v1/otp/verify', data)
+  }
+
+  async resendOTP(data: ResendOTPData): Promise<ApiResponse<void>> {
+    return await apiClient.post<void>('/api/v1/otp/resend', data)
+  }
+
+  async verifyRegistrationOTP(data: VerifyOTPData): Promise<ApiResponse<void>> {
+    return await apiClient.post<void>('/api/v1/auth/verify-registration-otp', data)
+  }
+
+  async verifyCorporateOTP(data: VerifyOTPData): Promise<ApiResponse<void>> {
+    return await apiClient.post<void>('/api/v1/auth/verify-corporate-otp', data)
   }
 
   // Utility methods

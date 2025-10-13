@@ -4,14 +4,14 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Check if the path is for admin/officer section
+  // Check if the path is for admin/officer section (Web Portal)
   if (pathname.startsWith('/eservice/dede/officer')) {
     // Get the token from the cookies
     const token = request.cookies.get('token')?.value
 
-    // If no token, redirect to login
+    // If no token, redirect to officer login page
     if (!token) {
-      return NextResponse.redirect(new URL('/login', request.url))
+      return NextResponse.redirect(new URL('/login-portal', request.url))
     }
 
     // For now, we'll just check if token exists

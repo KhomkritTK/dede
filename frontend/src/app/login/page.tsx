@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { useAuth } from '@/hooks/useAuth'
+import LoginWithOTP from '@/components/auth/LoginWithOTP'
+import PasswordReset from '@/components/auth/PasswordReset'
 
 interface LoginFormData {
   username: string
@@ -13,7 +15,34 @@ interface LoginFormData {
 export default function LoginPage() {
   const { login, isAuthenticated, isLoading, user } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+  const [showLoginWithOTP, setShowLoginWithOTP] = useState(false)
+  const [showPasswordReset, setShowPasswordReset] = useState(false)
+
+  useEffect(() => {
+    // Get message from URL params
+    const msg = searchParams.get('message')
+    if (msg) {
+      switch (msg) {
+        case 'password_reset':
+          setSuccess('รีเซ็ตรหัสผ่านสำเร็จแล้ว กรุณาเข้าสู่ระบบใหม่')
+          break
+        case 'invitation_accepted':
+          setSuccess('ยอมรับคำเชิญสำเร็จแล้ว กรุณาเข้าสู่ระบบ')
+          break
+        case 'registration_success':
+          setSuccess('สมัครสมาชิกสำเร็จแล้ว กรุณาเข้าสู่ระบบ')
+          break
+        case 'logout':
+          setSuccess('ออกจากระบบสำเร็จแล้ว')
+          break
+        default:
+          setSuccess(null)
+      }
+    }
+  }, [searchParams])
   
   const {
     register,
@@ -39,12 +68,50 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormData) => {
     setError(null)
+    setSuccess(null)
     
     const result = await login(data.username, data.password)
     
     if (!result.success) {
       setError(result.message || 'Login failed')
     }
+  }
+
+  const handleLoginWithOTPSuccess = () => {
+    setShowLoginWithOTP(false)
+    // The auth context will handle the redirect
+  }
+
+  const handlePasswordResetSuccess = () => {
+    setShowPasswordReset(false)
+    // Show success message and redirect to login
+    setError(null)
+  }
+
+  if (showLoginWithOTP) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-secondary-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
+          <LoginWithOTP
+            onSuccess={handleLoginWithOTPSuccess}
+            onCancel={() => setShowLoginWithOTP(false)}
+          />
+        </div>
+      </div>
+    )
+  }
+
+  if (showPasswordReset) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-secondary-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
+          <PasswordReset
+            onSuccess={handlePasswordResetSuccess}
+            onCancel={() => setShowPasswordReset(false)}
+          />
+        </div>
+      </div>
+    )
   }
 
   if (isLoading) {
@@ -141,13 +208,51 @@ export default function LoginPage() {
             </button>
           </div>
           
-          <div className="text-center">
-            <p className="text-sm text-secondary-600">
-              ยังไม่มีบัญชี?{' '}
-              <a href="/register" className="font-medium text-primary-600 hover:text-primary-500">
-                สมัครสมาชิก
-              </a>
-            </p>
+          <div className="space-y-4">
+            <div className="text-center">
+              <p className="text-sm text-secondary-600">
+                ยังไม่มีบัญชี?{' '}
+                <a href="/register" className="font-medium text-primary-600 hover:text-primary-500">
+                  สมัครสมาชิก
+                </a>
+              </p>
+            </div>
+            
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-secondary-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-secondary-50 text-secondary-500">หรือ</span>
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              <button
+                type="button"
+                onClick={() => setShowLoginWithOTP(true)}
+                className="w-full flex justify-center py-2 px-4 border border-secondary-300 text-sm font-medium rounded-md text-secondary-700 bg-white hover:bg-secondary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              >
+                เข้าสู่ระบบด้วย OTP
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => setShowPasswordReset(true)}
+                className="w-full flex justify-center py-2 px-4 text-sm font-medium text-primary-600 hover:text-primary-500"
+              >
+                ลืมรหัสผ่าน?
+              </button>
+            </div>
+            
+            <div className="text-center">
+              <p className="text-sm text-secondary-600">
+                เป็นเจ้าหน้าที่?{' '}
+                <a href="/login-portal" className="font-medium text-primary-600 hover:text-primary-500">
+                  เข้าสู่ระบบ Web Portal
+                </a>
+              </p>
+            </div>
           </div>
         </form>
       </div>
