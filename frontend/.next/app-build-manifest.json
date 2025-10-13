@@ -16,30 +16,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/eservice/dede/page.js"
     ],
-    "/eservice/dede/services/page": [
+    "/register/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/eservice/dede/services/page.js"
-    ],
-    "/eservice/dede/home/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/eservice/dede/home/page.js"
-    ],
-    "/eservice/dede/contact/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/eservice/dede/contact/page.js"
-    ],
-    "/eservice/dede/about/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/eservice/dede/about/page.js"
-    ],
-    "/login/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/login/page.js"
+      "static/chunks/app/register/page.js"
     ]
   }
 }

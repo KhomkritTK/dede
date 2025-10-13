@@ -26,19 +26,29 @@ const (
 )
 
 type User struct {
-	ID        uint           `json:"id" gorm:"primaryKey"`
-	Username  string         `json:"username" gorm:"uniqueIndex;not null"`
-	Email     string         `json:"email" gorm:"uniqueIndex;not null"`
-	Password  string         `json:"-" gorm:"not null"`
-	FullName  string         `json:"full_name" gorm:"not null"`
-	Role      UserRole       `json:"role" gorm:"not null;default:'user'"`
-	Status    UserStatus     `json:"status" gorm:"not null;default:'active'"`
-	Phone     string         `json:"phone"`
-	Company   string         `json:"company"`
-	Address   string         `json:"address"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
+	ID            uint           `json:"id" gorm:"primaryKey"`
+	Username      string         `json:"username" gorm:"uniqueIndex;not null"`
+	Email         string         `json:"email" gorm:"uniqueIndex;not null"`
+	Password      string         `json:"-" gorm:"not null"`
+	FullName      string         `json:"full_name" gorm:"not null"`
+	Role          UserRole       `json:"role" gorm:"not null;default:'user'"`
+	Status        UserStatus     `json:"status" gorm:"not null;default:'active'"`
+	Phone         string         `json:"phone"`
+	Company       string         `json:"company"`
+	Address       string         `json:"address"`
+	EmailVerified bool           `json:"email_verified" gorm:"default:false"`
+	PhoneVerified bool           `json:"phone_verified" gorm:"default:false"`
+	LastLoginAt   *time.Time     `json:"last_login_at"`
+	CreatedAt     time.Time      `json:"created_at"`
+	UpdatedAt     time.Time      `json:"updated_at"`
+	DeletedAt     gorm.DeletedAt `json:"-" gorm:"index"`
+
+	// Relationships
+	Profile        *UserProfile      `json:"profile,omitempty" gorm:"foreignKey:UserID"`
+	Corporates     []Corporate       `json:"corporates,omitempty" gorm:"foreignKey:AdminUserID"`
+	MemberOf       []CorporateMember `json:"member_of,omitempty" gorm:"foreignKey:UserID"`
+	InvitedMembers []CorporateMember `json:"invited_members,omitempty" gorm:"foreignKey:InvitedBy"`
+	OTPs           []OTP             `json:"otps,omitempty" gorm:"foreignKey:UserID"`
 }
 
 // TableName specifies the table name for the User model
