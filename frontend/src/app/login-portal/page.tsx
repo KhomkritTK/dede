@@ -68,10 +68,16 @@ export default function OfficerLoginPage() {
     if (!isLoading && isAuthenticated) {
       // Redirect based on user role
       if (user?.role === 'admin' ||
-          user?.role === 'dede_head' ||
-          user?.role === 'dede_staff' ||
-          user?.role === 'dede_consult' ||
-          user?.role === 'auditor') {
+          user?.role === 'system_admin' ||
+          user?.role === 'dede_head_admin' ||
+          user?.role === 'dede_staff_admin' ||
+          user?.role === 'dede_consult_admin' ||
+          user?.role === 'auditor_admin') {
+        router.push('/admin-portal/dashboard')
+      } else if (user?.role === 'dede_head' ||
+                 user?.role === 'dede_staff' ||
+                 user?.role === 'dede_consult' ||
+                 user?.role === 'auditor') {
         router.push('/eservice/dede/officer/dashboard')
       } else {
         router.push('/eservice/dede')

@@ -28,6 +28,9 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
 		// Public routes (no authentication required)
 		PublicRoutes(v1, db, cfg)
 
+		// Admin portal routes (mixed public and protected)
+		AdminPortalRoutes(v1, db, cfg)
+
 		// Protected routes (authentication required)
 		protected := v1.Group("")
 		protected.Use(middleware.AuthMiddleware(cfg.JWTSecret))

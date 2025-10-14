@@ -1,9 +1,8 @@
 {
+  "/not-found": "app/not-found.js",
   "/eservice/dede/page": "app/eservice/dede/page.js",
-  "/eservice/dede/home/page": "app/eservice/dede/home/page.js",
-  "/eservice/dede/services/page": "app/eservice/dede/services/page.js",
-  "/eservice/dede/license/renewal/page": "app/eservice/dede/license/renewal/page.js",
-  "/login/page": "app/login/page.js",
-  "/register/page": "app/register/page.js",
-  "/login-portal/page": "app/login-portal/page.js"
+  "/login-portal/page": "app/login-portal/page.js",
+  "/admin-portal/dashboard/page": "app/admin-portal/dashboard/page.js",
+  "/admin-portal/services/page": "app/admin-portal/services/page.js",
+  "/admin-portal/flow/page": "app/admin-portal/flow/page.js"
 }
