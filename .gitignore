@@ -64,3 +64,19 @@ coverage.out
 
 # Air live reload
 tmp/
+
+# Node modules
+node_modules/
+
+# Next.js build output
+.next/
+out/
+
+# Next.js production build
+build/
+
+# Next.js cache
+.cache/
+
+# Vercel
+.vercel
