@@ -1,7 +1,8 @@
 {
-  "/not-found": "app/not-found.js",
-  "/page": "app/page.js",
-  "/eservice/dede/services/page": "app/eservice/dede/services/page.js",
-  "/eservice/dede/page": "app/eservice/dede/page.js",
-  "/login/page": "app/login/page.js"
+  "/eservice/dede/contact/page": "app/eservice/dede/contact/page.js",
+  "/eservice/dede/about/page": "app/eservice/dede/about/page.js",
+  "/eservice/dede/home/page": "app/eservice/dede/home/page.js",
+  "/login-portal/page": "app/login-portal/page.js",
+  "/login/page": "app/login/page.js",
+  "/register/page": "app/register/page.js"
 }
