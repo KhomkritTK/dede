@@ -15,7 +15,6 @@ func AdminPortalRoutes(r *gin.RouterGroup, db *gorm.DB, cfg *config.Config) {
 	// Create handlers
 	authHandler := authhandler.NewAuthHandler(db, cfg)
 	adminHandler := adminhandler.NewAdminHandler(db, cfg)
-	flowHandler := adminhandler.NewServiceFlowHandler(db, cfg)
 
 	// Public routes for admin portal login
 	public := r.Group("/admin-portal")
@@ -41,45 +40,15 @@ func AdminPortalRoutes(r *gin.RouterGroup, db *gorm.DB, cfg *config.Config) {
 			auth.PUT("/profile", authHandler.UpdateProfile)
 		}
 
-		// Admin management routes (system admin only)
-		admin := protected.Group("/admin")
-		admin.Use(middleware.RequireRole([]string{"system_admin"}))
-		{
-			admin.GET("/users", adminHandler.GetAdminUsers)
-			admin.POST("/users", adminHandler.CreateAdminUser)
-			admin.GET("/users/:id", adminHandler.GetAdminUser)
-			admin.PUT("/users/:id", adminHandler.UpdateAdminUser)
-			admin.DELETE("/users/:id", adminHandler.DeleteAdminUser)
-		}
-
-		// Service flow management routes
-		flow := protected.Group("/flow")
-		{
-			// All authenticated admins can view flow logs
-			flow.GET("/logs", flowHandler.GetServiceFlowLogs)
-			flow.GET("/logs/:requestId", flowHandler.GetServiceFlowLogsByRequest)
-
-			// Admins with appropriate permissions can manage flow
-			flow.POST("/logs", flowHandler.CreateServiceFlowLog)
-			flow.PUT("/logs/:id", flowHandler.UpdateServiceFlowLog)
-		}
-
-		// Dashboard and statistics routes
-		dashboard := protected.Group("/dashboard")
-		{
-			dashboard.GET("/stats", flowHandler.GetDashboardStats)
-			dashboard.GET("/stats/summary", flowHandler.GetServiceSummaryStats)
-			dashboard.GET("/stats/timeline", flowHandler.GetTimelineStats)
-			dashboard.GET("/stats/performance", flowHandler.GetPerformanceStats)
-		}
-
 		// Service request management
 		services := protected.Group("/services")
 		{
-			services.GET("/requests", adminHandler.GetLicenseRequests)
-			services.GET("/requests/:id", adminHandler.GetLicenseRequest)
-			services.PUT("/requests/:id/status", adminHandler.UpdateLicenseRequestStatus)
-			services.POST("/requests/:id/assign", adminHandler.AssignInspector)
+			services.GET("/requests", adminHandler.GetAllLicenseRequests)
+			services.GET("/requests/:id", adminHandler.GetLicenseRequestDetails)
+			services.PUT("/requests/:id/status", adminHandler.UpdateRequestStatus)
+			services.POST("/requests/:id/assign", adminHandler.AssignRequest)
+			services.POST("/requests/:id/return", adminHandler.ReturnDocumentsToUser)
+			services.POST("/requests/:id/forward", adminHandler.ForwardToDedeHead)
 		}
 	}
 }

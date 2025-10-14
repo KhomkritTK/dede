@@ -9,6 +9,7 @@ import (
 // RenewalLicenseRepo interface for renewal license requests
 type RenewalLicenseRepo interface {
 	Create(request *models.RenewalLicenseRequest) error
+	GetAll() ([]models.RenewalLicenseRequest, error)
 }
 
 type renewalLicenseRepo struct {
@@ -23,9 +24,16 @@ func (r *renewalLicenseRepo) Create(request *models.RenewalLicenseRequest) error
 	return r.db.Create(request).Error
 }
 
+func (r *renewalLicenseRepo) GetAll() ([]models.RenewalLicenseRequest, error) {
+	var requests []models.RenewalLicenseRequest
+	err := r.db.Preload("User").Order("created_at DESC").Find(&requests).Error
+	return requests, err
+}
+
 // ExtensionLicenseRepo interface for extension license requests
 type ExtensionLicenseRepo interface {
 	Create(request *models.ExtensionLicenseRequest) error
+	GetAll() ([]models.ExtensionLicenseRequest, error)
 }
 
 type extensionLicenseRepo struct {
@@ -40,9 +48,16 @@ func (r *extensionLicenseRepo) Create(request *models.ExtensionLicenseRequest) e
 	return r.db.Create(request).Error
 }
 
+func (r *extensionLicenseRepo) GetAll() ([]models.ExtensionLicenseRequest, error) {
+	var requests []models.ExtensionLicenseRequest
+	err := r.db.Preload("User").Order("created_at DESC").Find(&requests).Error
+	return requests, err
+}
+
 // ReductionLicenseRepo interface for reduction license requests
 type ReductionLicenseRepo interface {
 	Create(request *models.ReductionLicenseRequest) error
+	GetAll() ([]models.ReductionLicenseRequest, error)
 }
 
 type reductionLicenseRepo struct {
@@ -55,4 +70,10 @@ func NewReductionLicenseRepo(db *gorm.DB) ReductionLicenseRepo {
 
 func (r *reductionLicenseRepo) Create(request *models.ReductionLicenseRequest) error {
 	return r.db.Create(request).Error
+}
+
+func (r *reductionLicenseRepo) GetAll() ([]models.ReductionLicenseRequest, error) {
+	var requests []models.ReductionLicenseRequest
+	err := r.db.Preload("User").Order("created_at DESC").Find(&requests).Error
+	return requests, err
 }

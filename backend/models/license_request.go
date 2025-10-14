@@ -33,6 +33,8 @@ const (
 	StatusReportApproved RequestStatus = "report_approved" // รับรองรายงาน
 	StatusApproved       RequestStatus = "approved"        // อนุมัติใบอนุญาต
 	StatusRejectedFinal  RequestStatus = "rejected_final"  // ปฏิเสธสุดท้าย
+	StatusReturned       RequestStatus = "returned"        // ตีเอกสารกลับไปแก้ไข
+	StatusForwarded      RequestStatus = "forwarded"       // ส่งต่อให้ DEDE Admin
 )
 
 type LicenseRequest struct {

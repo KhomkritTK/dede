@@ -54,15 +54,8 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                 {isAuthenticated ? (
                   <>
                     <span className="text-gray-600 px-3 py-2 rounded-lg text-sm font-medium font-sans bg-gray-100">
-                      สวัสดี, {user?.firstName} {user?.lastName}
+                      สวัสดี, {user?.username}
                     </span>
-                    
-                    <Link
-                      href="/eservice/dede/dashboard"
-                      className="text-gray-600 hover:text-green-600 px-3 py-2 rounded-lg text-sm font-medium font-sans hover:bg-green-50 transition-colors duration-200"
-                    >
-                      แดชบอร์ด
-                    </Link>
                     
                     {/* Show different options based on user role */}
                     {(user?.role === 'admin' ||
@@ -139,17 +132,8 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                 <div className="flex flex-col items-start space-y-2">
                   <div className="flex-shrink-0">
                     <span className="text-gray-600 px-3 py-2 rounded-lg text-sm font-medium font-sans bg-gray-100">
-                      สวัสดี, {user?.firstName} {user?.lastName}
+                      สวัสดี, {user?.username}
                     </span>
-                  </div>
-                  
-                  <div className="flex-shrink-0">
-                    <Link
-                      href="/eservice/dede/dashboard"
-                      className="text-gray-600 hover:text-green-600 px-3 py-2 rounded-lg text-sm font-medium font-sans hover:bg-green-50 transition-colors duration-200"
-                    >
-                      แดชบอร์ด
-                    </Link>
                   </div>
                   
                   {/* Show different options based on user role */}

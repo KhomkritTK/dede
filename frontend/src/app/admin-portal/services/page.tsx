@@ -29,12 +29,30 @@ interface LicenseRequest {
   }
 }
 
+// Updated interface to match the new API response
+interface UnifiedLicenseRequest {
+  id: number
+  request_number: string
+  license_type: string
+  status: string
+  title: string
+  description: string
+  request_date: string
+  user_id: number
+  user: {
+    id: number
+    username: string
+    full_name: string
+    email: string
+  }
+}
+
 export default function AdminServicesPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
 
-  // Fetch license requests
+  // Fetch license requests from all four tables
   const { data: licenseRequests, isLoading } = useQuery({
     queryKey: ['admin-license-requests', searchTerm, statusFilter, typeFilter],
     queryFn: async () => {
@@ -43,7 +61,7 @@ export default function AdminServicesPage() {
       if (statusFilter) params.append('status', statusFilter)
       if (typeFilter) params.append('licenseType', typeFilter)
       
-      const response = await apiClient.get<LicenseRequest[]>(`/api/v1/admin-portal/services/requests?${params}`)
+      const response = await apiClient.get<UnifiedLicenseRequest[]>(`/api/v1/admin-portal/services/requests?${params}`)
       return response.data
     },
   })
@@ -52,11 +70,11 @@ export default function AdminServicesPage() {
     switch (type) {
       case 'new':
         return 'ขอรับใบอนุญาตใหม่'
-      case 'renew':
+      case 'renewal':
         return 'ขอต่ออายุใบอนุญาต'
-      case 'expand':
+      case 'extension':
         return 'ขอขยายการผลิต'
-      case 'reduce':
+      case 'reduction':
         return 'ขอลดการผลิต'
       default:
         return type
@@ -87,6 +105,10 @@ export default function AdminServicesPage() {
         return 'ปฏิเสธคำขอ'
       case 'rejected_final':
         return 'ปฏิเสธสุดท้าย'
+      case 'returned':
+        return 'ตีเอกสารกลับไปแก้ไข'
+      case 'forwarded':
+        return 'ส่งต่อให้ DEDE Head'
       default:
         return status
     }
@@ -115,6 +137,10 @@ export default function AdminServicesPage() {
       case 'rejected':
       case 'rejected_final':
         return 'bg-red-100 text-red-800'
+      case 'returned':
+        return 'bg-amber-100 text-amber-800'
+      case 'forwarded':
+        return 'bg-cyan-100 text-cyan-800'
       default:
         return 'bg-gray-100 text-gray-800'
     }
@@ -174,6 +200,8 @@ export default function AdminServicesPage() {
                 <option value="report_approved">รับรองรายงาน</option>
                 <option value="approved">อนุมัติใบอนุญาต</option>
                 <option value="rejected">ปฏิเสธคำขอ</option>
+                <option value="returned">ตีเอกสารกลับไปแก้ไข</option>
+                <option value="forwarded">ส่งต่อให้ DEDE Head</option>
               </select>
             </div>
 
@@ -185,9 +213,9 @@ export default function AdminServicesPage() {
               >
                 <option value="">ทุกประเภท</option>
                 <option value="new">ขอรับใบอนุญาตใหม่</option>
-                <option value="renew">ขอต่ออายุใบอนุญาต</option>
-                <option value="expand">ขอขยายการผลิต</option>
-                <option value="reduce">ขอลดการผลิต</option>
+                <option value="renewal">ขอต่ออายุใบอนุญาต</option>
+                <option value="extension">ขอขยายการผลิต</option>
+                <option value="reduction">ขอลดการผลิต</option>
               </select>
             </div>
 
@@ -239,19 +267,18 @@ export default function AdminServicesPage() {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Link
-                        href={`/admin-portal/services/${request.id}`}
+                        href={`/admin-portal/services/${request.id}?type=${request.license_type}`}
                         className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                       >
                         <EyeIcon className="h-4 w-4 mr-1" />
                         ดูรายละเอียด
                       </Link>
-                      <Link
-                        href={`/admin-portal/services/${request.id}/edit`}
+                      <button
                         className="inline-flex items-center px-3 py-1 border border-blue-300 shadow-sm text-sm leading-4 font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                       >
                         <PencilIcon className="h-4 w-4 mr-1" />
                         จัดการ
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 </div>

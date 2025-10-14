@@ -54,6 +54,10 @@ func (sfl *ServiceFlowLog) GetStatusDisplayName(status RequestStatus) string {
 		return "อนุมัติใบอนุญาต"
 	case StatusRejectedFinal:
 		return "ปฏิเสธสุดท้าย"
+	case StatusReturned:
+		return "ตีเอกสารกลับไปแก้ไข"
+	case StatusForwarded:
+		return "ส่งต่อให้ DEDE Admin"
 	default:
 		return string(status)
 	}
@@ -86,6 +90,10 @@ func (sfl *ServiceFlowLog) GetStatusColor(status RequestStatus) string {
 		return "bg-green-100 text-green-800"
 	case StatusApproved:
 		return "bg-green-100 text-green-800"
+	case StatusReturned:
+		return "bg-amber-100 text-amber-800"
+	case StatusForwarded:
+		return "bg-cyan-100 text-cyan-800"
 	default:
 		return "bg-gray-100 text-gray-800"
 	}
@@ -105,6 +113,8 @@ func (sfl *ServiceFlowLog) IsStatusProgress() bool {
 		StatusDocumentEdit:   7,
 		StatusReportApproved: 8,
 		StatusApproved:       9,
+		StatusReturned:       2,  // Go back to user for editing
+		StatusForwarded:      10, // Forward to DEDE Admin
 		StatusRejected:       -1,
 		StatusRejectedFinal:  -2,
 		StatusOverdue:        -3,
