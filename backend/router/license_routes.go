@@ -32,5 +32,11 @@ func LicenseRoutes(r *gin.RouterGroup, db *gorm.DB, cfg *config.Config) {
 
 		// My requests (for current user)
 		licenses.GET("/my", licenseHandler.GetMyLicenseRequests)
+
+		// Specific license type requests
+		licenses.POST("/new", licenseHandler.CreateNewLicenseRequest)
+		licenses.POST("/renewal", licenseHandler.CreateRenewalLicenseRequest)
+		licenses.POST("/extension", licenseHandler.CreateExtensionLicenseRequest)
+		licenses.POST("/reduction", licenseHandler.CreateReductionLicenseRequest)
 	}
 }

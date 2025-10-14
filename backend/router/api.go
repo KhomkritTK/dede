@@ -9,6 +9,12 @@ import (
 )
 
 func SetupRoutes(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
+	// Set database in context
+	r.Use(func(c *gin.Context) {
+		c.Set("db", db)
+		c.Next()
+	})
+
 	// Global middleware
 	r.Use(middleware.LoggingMiddleware())
 	r.Use(middleware.RecoveryMiddleware())

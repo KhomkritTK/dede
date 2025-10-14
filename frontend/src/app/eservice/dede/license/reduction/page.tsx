@@ -7,9 +7,11 @@ import { useAuth } from '@/hooks/useAuth'
 import PublicLayout from '@/components/layout/PublicLayout'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
+import { licenseApi, ReductionLicenseRequest } from '@/lib/license-api'
 
 // Validation schema
 const reductionSchema = yup.object().shape({
+  licenseType: yup.string().required('กรุณาเลือกประเภทใบอนุญาต'),
   licenseNumber: yup.string().required('กรุณาระบุเลขที่ใบอนุญาต'),
   projectName: yup.string().required('กรุณาระบุชื่อโครงการ'),
   currentCapacity: yup.string().required('กรุณาระบุกำลังการผลิตปัจจุบัน'),
@@ -25,6 +27,7 @@ const reductionSchema = yup.object().shape({
 })
 
 interface ReductionFormData {
+  licenseType: string
   licenseNumber: string
   projectName: string
   currentCapacity: string
@@ -54,6 +57,7 @@ export default function ProductionReductionPage() {
   } = useForm<ReductionFormData>({
     resolver: yupResolver(reductionSchema),
     defaultValues: {
+      licenseType: 'reduce',
       licenseNumber: '',
       projectName: '',
       currentCapacity: '',
@@ -82,15 +86,33 @@ export default function ProductionReductionPage() {
     setError(null)
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      // Prepare data for API
+      const requestData: ReductionLicenseRequest = {
+        licenseType: data.licenseType,
+        licenseNumber: data.licenseNumber,
+        projectName: data.projectName,
+        currentCapacity: data.currentCapacity,
+        currentCapacityUnit: data.currentCapacityUnit,
+        requestedCapacity: data.requestedCapacity,
+        requestedCapacityUnit: data.requestedCapacityUnit,
+        reductionReason: data.reductionReason,
+        expectedStartDate: data.expectedStartDate,
+        contactPerson: data.contactPerson,
+        contactPhone: data.contactPhone,
+        contactEmail: data.contactEmail,
+        description: data.description
+      }
       
-      // In a real application, you would make an API call here
-      console.log('Submitting production reduction request:', data)
+      // Make API call
+      const response = await licenseApi.createReductionLicenseRequest(requestData)
       
-      setSubmitSuccess(true)
+      if (response.success) {
+        setSubmitSuccess(true)
+      } else {
+        setError(response.message || 'เกิดข้อผิดพลาดในการส่งคำขอ')
+      }
     } catch (err: any) {
-      setError(err.message || 'เกิดข้อผิดพลาดในการส่งคำขอ')
+      setError(err.response?.data?.message || err.message || 'เกิดข้อผิดพลาดในการส่งคำขอ')
     } finally {
       setIsSubmitting(false)
     }
@@ -126,10 +148,10 @@ export default function ProductionReductionPage() {
             </p>
             <div className="mt-6 flex justify-center space-x-4">
               <button
-                onClick={() => router.push('/eservice/dede/dashboard')}
+                onClick={() => router.push('/eservice/dede/home')}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                กลับสู่แดชบอร์ด
+                กลับสู่หน้าแรก
               </button>
               <button
                 onClick={() => router.push('/eservice/dede/license/reduction')}
@@ -155,15 +177,16 @@ export default function ProductionReductionPage() {
         </div>
 
         {error && (
-          <div className="mb-6 rounded-md bg-red-50 p-4">
+          <div className="mb-6 rounded-lg bg-red-50 border border-red-200 p-4">
             <div className="flex">
               <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
               </div>
               <div className="ml-3">
-                <p className="text-sm text-red-800">{error}</p>
+                <h3 className="text-sm font-medium text-red-800">เกิดข้อผิดพลาด</h3>
+                <p className="mt-1 text-sm text-red-700">{error}</p>
               </div>
             </div>
           </div>
@@ -171,56 +194,66 @@ export default function ProductionReductionPage() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           {/* License Information */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">ข้อมูลใบอนุญาต</h2>
+          <div className="bg-white shadow-lg rounded-xl p-6 border border-gray-100">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6 pb-3 border-b border-gray-200">ข้อมูลใบอนุญาต</h2>
             
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
-                <label htmlFor="licenseNumber" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="licenseNumber" className="block text-sm font-semibold text-gray-700 mb-2">
                   เลขที่ใบอนุญาต <span className="text-red-500">*</span>
                 </label>
                 <input
                   {...register('licenseNumber')}
                   type="text"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-base transition-colors duration-200 text-gray-900 placeholder-gray-500"
                   placeholder="เลขที่ใบอนุญาต"
                 />
                 {errors.licenseNumber && (
-                  <p className="mt-1 text-sm text-red-600">{errors.licenseNumber.message}</p>
+                  <div className="mt-2 flex items-start">
+                    <svg className="h-4 w-4 text-red-500 mt-0.5 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    <p className="text-sm font-medium text-red-600">{errors.licenseNumber.message}</p>
+                  </div>
                 )}
               </div>
 
               <div>
-                <label htmlFor="projectName" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="projectName" className="block text-sm font-semibold text-gray-700 mb-2">
                   ชื่อโครงการ <span className="text-red-500">*</span>
                 </label>
                 <input
                   {...register('projectName')}
                   type="text"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-base transition-colors duration-200 text-gray-900 placeholder-gray-500"
                   placeholder="ชื่อโครงการ"
                 />
                 {errors.projectName && (
-                  <p className="mt-1 text-sm text-red-600">{errors.projectName.message}</p>
+                  <div className="mt-2 flex items-start">
+                    <svg className="h-4 w-4 text-red-500 mt-0.5 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    <p className="text-sm font-medium text-red-600">{errors.projectName.message}</p>
+                  </div>
                 )}
               </div>
             </div>
 
             <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
-                <label htmlFor="currentCapacity" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="currentCapacity" className="block text-sm font-semibold text-gray-700 mb-2">
                   กำลังการผลิตปัจจุบัน <span className="text-red-500">*</span>
                 </label>
-                <div className="mt-1 flex rounded-md shadow-sm">
+                <div className="mt-1 flex rounded-lg shadow-sm">
                   <input
                     {...register('currentCapacity')}
                     type="text"
-                    className="flex-1 block w-full px-3 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="flex-1 block w-full px-4 py-3 border border-gray-300 rounded-l-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-base transition-colors duration-200 text-gray-900 placeholder-gray-500"
                     placeholder="กำลังการผลิต"
                   />
                   <select
                     {...register('currentCapacityUnit')}
-                    className="inline-flex items-center px-3 border border-l-0 border-gray-300 rounded-r-md bg-gray-50 text-gray-500 sm:text-sm"
+                    className="inline-flex items-center px-4 border border-l-0 border-gray-300 rounded-r-lg bg-gray-50 text-gray-700 sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                   >
                     <option value="MW">MW</option>
                     <option value="kW">kW</option>
@@ -229,24 +262,29 @@ export default function ProductionReductionPage() {
                   </select>
                 </div>
                 {errors.currentCapacity && (
-                  <p className="mt-1 text-sm text-red-600">{errors.currentCapacity.message}</p>
+                  <div className="mt-2 flex items-start">
+                    <svg className="h-4 w-4 text-red-500 mt-0.5 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    <p className="text-sm font-medium text-red-600">{errors.currentCapacity.message}</p>
+                  </div>
                 )}
               </div>
 
               <div>
-                <label htmlFor="requestedCapacity" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="requestedCapacity" className="block text-sm font-semibold text-gray-700 mb-2">
                   กำลังการผลิตที่ขอ <span className="text-red-500">*</span>
                 </label>
-                <div className="mt-1 flex rounded-md shadow-sm">
+                <div className="mt-1 flex rounded-lg shadow-sm">
                   <input
                     {...register('requestedCapacity')}
                     type="text"
-                    className="flex-1 block w-full px-3 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="flex-1 block w-full px-4 py-3 border border-gray-300 rounded-l-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-base transition-colors duration-200 text-gray-900 placeholder-gray-500"
                     placeholder="กำลังการผลิตที่ขอ"
                   />
                   <select
                     {...register('requestedCapacityUnit')}
-                    className="inline-flex items-center px-3 border border-l-0 border-gray-300 rounded-r-md bg-gray-50 text-gray-500 sm:text-sm"
+                    className="inline-flex items-center px-4 border border-l-0 border-gray-300 rounded-r-lg bg-gray-50 text-gray-700 sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                   >
                     <option value="MW">MW</option>
                     <option value="kW">kW</option>
@@ -255,18 +293,23 @@ export default function ProductionReductionPage() {
                   </select>
                 </div>
                 {errors.requestedCapacity && (
-                  <p className="mt-1 text-sm text-red-600">{errors.requestedCapacity.message}</p>
+                  <div className="mt-2 flex items-start">
+                    <svg className="h-4 w-4 text-red-500 mt-0.5 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    <p className="text-sm font-medium text-red-600">{errors.requestedCapacity.message}</p>
+                  </div>
                 )}
               </div>
             </div>
 
             <div className="mt-6">
-              <label htmlFor="reductionReason" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="reductionReason" className="block text-sm font-semibold text-gray-700 mb-2">
                 เหตุผลในการขอลดการผลิต <span className="text-red-500">*</span>
               </label>
               <select
                 {...register('reductionReason')}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-base transition-colors duration-200 text-gray-900"
               >
                 <option value="">เลือกเหตุผลในการขอลดการผลิต</option>
                 <option value="demand_decrease">ความต้องการพลังงานลดลง</option>
@@ -276,112 +319,142 @@ export default function ProductionReductionPage() {
                 <option value="other">อื่นๆ</option>
               </select>
               {errors.reductionReason && (
-                <p className="mt-1 text-sm text-red-600">{errors.reductionReason.message}</p>
+                <div className="mt-2 flex items-start">
+                  <svg className="h-4 w-4 text-red-500 mt-0.5 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm font-medium text-red-600">{errors.reductionReason.message}</p>
+                </div>
               )}
             </div>
           </div>
 
           {/* Reduction Details */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">รายละเอียดการขอลด</h2>
+          <div className="bg-white shadow-lg rounded-xl p-6 border border-gray-100">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6 pb-3 border-b border-gray-200">รายละเอียดการขอลด</h2>
             
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
-                <label htmlFor="expectedStartDate" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="expectedStartDate" className="block text-sm font-semibold text-gray-700 mb-2">
                   วันที่คาดว่าจะเริ่มผลิต (กำลังการผลิตที่ลดลง) <span className="text-red-500">*</span>
                 </label>
                 <input
                   {...register('expectedStartDate')}
                   type="date"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-base transition-colors duration-200 text-gray-900"
                 />
                 {errors.expectedStartDate && (
-                  <p className="mt-1 text-sm text-red-600">{errors.expectedStartDate.message}</p>
+                  <div className="mt-2 flex items-start">
+                    <svg className="h-4 w-4 text-red-500 mt-0.5 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    <p className="text-sm font-medium text-red-600">{errors.expectedStartDate.message}</p>
+                  </div>
                 )}
               </div>
             </div>
 
             <div className="mt-6">
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="description" className="block text-sm font-semibold text-gray-700 mb-2">
                 รายละเอียดการขอลดการผลิต <span className="text-red-500">*</span>
               </label>
               <textarea
                 {...register('description')}
                 rows={4}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-base transition-colors duration-200 text-gray-900 placeholder-gray-500"
                 placeholder="กรุณาระบุรายละเอียดการขอลดการผลิต"
               />
               {errors.description && (
-                <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
+                <div className="mt-2 flex items-start">
+                  <svg className="h-4 w-4 text-red-500 mt-0.5 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm font-medium text-red-600">{errors.description.message}</p>
+                </div>
               )}
             </div>
           </div>
 
           {/* Contact Information */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">ข้อมูลผู้ติดต่อ</h2>
+          <div className="bg-white shadow-lg rounded-xl p-6 border border-gray-100">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6 pb-3 border-b border-gray-200">ข้อมูลผู้ติดต่อ</h2>
             
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
-                <label htmlFor="contactPerson" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="contactPerson" className="block text-sm font-semibold text-gray-700 mb-2">
                   ชื่อผู้ติดต่อ <span className="text-red-500">*</span>
                 </label>
                 <input
                   {...register('contactPerson')}
                   type="text"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-base transition-colors duration-200 text-gray-900 placeholder-gray-500"
                   placeholder="ชื่อผู้ติดต่อ"
                 />
                 {errors.contactPerson && (
-                  <p className="mt-1 text-sm text-red-600">{errors.contactPerson.message}</p>
+                  <div className="mt-2 flex items-start">
+                    <svg className="h-4 w-4 text-red-500 mt-0.5 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    <p className="text-sm font-medium text-red-600">{errors.contactPerson.message}</p>
+                  </div>
                 )}
               </div>
 
               <div>
-                <label htmlFor="contactPhone" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="contactPhone" className="block text-sm font-semibold text-gray-700 mb-2">
                   เบอร์โทรศัพท์ผู้ติดต่อ <span className="text-red-500">*</span>
                 </label>
                 <input
                   {...register('contactPhone')}
                   type="tel"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-base transition-colors duration-200 text-gray-900 placeholder-gray-500"
                   placeholder="เบอร์โทรศัพท์"
                 />
                 {errors.contactPhone && (
-                  <p className="mt-1 text-sm text-red-600">{errors.contactPhone.message}</p>
+                  <div className="mt-2 flex items-start">
+                    <svg className="h-4 w-4 text-red-500 mt-0.5 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    <p className="text-sm font-medium text-red-600">{errors.contactPhone.message}</p>
+                  </div>
                 )}
               </div>
 
               <div className="sm:col-span-2">
-                <label htmlFor="contactEmail" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="contactEmail" className="block text-sm font-semibold text-gray-700 mb-2">
                   อีเมลผู้ติดต่อ <span className="text-red-500">*</span>
                 </label>
                 <input
                   {...register('contactEmail')}
                   type="email"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-base transition-colors duration-200"
                   placeholder="อีเมล"
                 />
                 {errors.contactEmail && (
-                  <p className="mt-1 text-sm text-red-600">{errors.contactEmail.message}</p>
+                  <div className="mt-2 flex items-start">
+                    <svg className="h-4 w-4 text-red-500 mt-0.5 mr-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    <p className="text-sm font-medium text-red-600">{errors.contactEmail.message}</p>
+                  </div>
                 )}
               </div>
             </div>
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-end">
+          <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
             <button
               type="button"
               onClick={() => router.push('/eservice/dede/dashboard')}
-              className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-3"
+              className="px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
             >
               ยกเลิก
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="inline-flex justify-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors duration-200"
             >
               {isSubmitting ? (
                 <>

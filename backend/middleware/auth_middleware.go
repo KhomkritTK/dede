@@ -15,14 +15,18 @@ func AuthMiddleware(secretKey string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is required"})
+			if !c.Writer.Written() {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is required"})
+			}
 			c.Abort()
 			return
 		}
 
 		// Check if the token has the Bearer prefix
 		if !strings.HasPrefix(authHeader, "Bearer ") {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid authorization header format"})
+			if !c.Writer.Written() {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid authorization header format"})
+			}
 			c.Abort()
 			return
 		}
@@ -30,7 +34,9 @@ func AuthMiddleware(secretKey string) gin.HandlerFunc {
 		// Extract the token
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		if tokenString == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token is required"})
+			if !c.Writer.Written() {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Token is required"})
+			}
 			c.Abort()
 			return
 		}
@@ -38,7 +44,9 @@ func AuthMiddleware(secretKey string) gin.HandlerFunc {
 		// Validate the token
 		claims, err := utils.ValidateJWT(tokenString, secretKey)
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+			if !c.Writer.Written() {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+			}
 			c.Abort()
 			return
 		}
@@ -47,10 +55,12 @@ func AuthMiddleware(secretKey string) gin.HandlerFunc {
 		db := c.MustGet("db").(*gorm.DB)
 		var user models.User
 		if err := db.First(&user, claims.UserID).Error; err != nil {
-			if err == gorm.ErrRecordNotFound {
-				c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
-			} else {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+			if !c.Writer.Written() {
+				if err == gorm.ErrRecordNotFound {
+					c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+				} else {
+					c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+				}
 			}
 			c.Abort()
 			return
@@ -58,7 +68,9 @@ func AuthMiddleware(secretKey string) gin.HandlerFunc {
 
 		// Check if user is active
 		if !user.IsActive() {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "User account is not active"})
+			if !c.Writer.Written() {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "User account is not active"})
+			}
 			c.Abort()
 			return
 		}
@@ -77,14 +89,18 @@ func RequireRole(roles []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		user, exists := c.Get("user")
 		if !exists {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+			if !c.Writer.Written() {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+			}
 			c.Abort()
 			return
 		}
 
 		userModel, ok := user.(models.User)
 		if !ok {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user data"})
+			if !c.Writer.Written() {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user data"})
+			}
 			c.Abort()
 			return
 		}
@@ -100,7 +116,9 @@ func RequireRole(roles []string) gin.HandlerFunc {
 		}
 
 		if !hasRequiredRole {
-			c.JSON(http.StatusForbidden, gin.H{"error": "Insufficient permissions"})
+			if !c.Writer.Written() {
+				c.JSON(http.StatusForbidden, gin.H{"error": "Insufficient permissions"})
+			}
 			c.Abort()
 			return
 		}

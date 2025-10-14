@@ -3,6 +3,7 @@ package usecase
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"eservice-backend/models"
@@ -13,6 +14,10 @@ import (
 
 type LicenseUsecase interface {
 	CreateLicenseRequest(userID uint, req dto.CreateLicenseRequestRequest) (*dto.LicenseRequestResponse, error)
+	CreateNewLicenseRequest(userID uint, req dto.NewLicenseRequestRequest) (*dto.LicenseRequestResponse, error)
+	CreateRenewalLicenseRequest(userID uint, req dto.RenewalLicenseRequestRequest) (*dto.LicenseRequestResponse, error)
+	CreateExtensionLicenseRequest(userID uint, req dto.ExtensionLicenseRequestRequest) (*dto.LicenseRequestResponse, error)
+	CreateReductionLicenseRequest(userID uint, req dto.ReductionLicenseRequestRequest) (*dto.LicenseRequestResponse, error)
 	GetLicenseRequestByID(id uint) (*dto.LicenseRequestResponse, error)
 	GetLicenseRequests(page, limit int, search string, status string, userID uint) (*dto.LicenseRequestListResponse, error)
 	UpdateLicenseRequest(id uint, req dto.UpdateLicenseRequestRequest) (*dto.LicenseRequestResponse, error)
@@ -28,14 +33,28 @@ type LicenseUsecase interface {
 }
 
 type licenseUsecase struct {
-	licenseRepo repository.LicenseRequestRepository
-	userRepo    repository.UserRepository
+	licenseRepo          repository.LicenseRequestRepository
+	newLicenseRepo       repository.NewLicenseRepo
+	renewalLicenseRepo   repository.RenewalLicenseRepo
+	extensionLicenseRepo repository.ExtensionLicenseRepo
+	reductionLicenseRepo repository.ReductionLicenseRepo
+	userRepo             repository.UserRepository
 }
 
-func NewLicenseUsecase(licenseRepo repository.LicenseRequestRepository, userRepo repository.UserRepository) LicenseUsecase {
+func NewLicenseUsecase(
+	licenseRepo repository.LicenseRequestRepository,
+	newLicenseRepo repository.NewLicenseRepo,
+	renewalLicenseRepo repository.RenewalLicenseRepo,
+	extensionLicenseRepo repository.ExtensionLicenseRepo,
+	reductionLicenseRepo repository.ReductionLicenseRepo,
+	userRepo repository.UserRepository) LicenseUsecase {
 	return &licenseUsecase{
-		licenseRepo: licenseRepo,
-		userRepo:    userRepo,
+		licenseRepo:          licenseRepo,
+		newLicenseRepo:       newLicenseRepo,
+		renewalLicenseRepo:   renewalLicenseRepo,
+		extensionLicenseRepo: extensionLicenseRepo,
+		reductionLicenseRepo: reductionLicenseRepo,
+		userRepo:             userRepo,
 	}
 }
 
@@ -391,6 +410,263 @@ func (u *licenseUsecase) convertToLicenseRequestResponse(request *models.License
 			Role:     string(request.AssignedBy.Role),
 			Status:   string(request.AssignedBy.Status),
 		}
+	}
+
+	return response, nil
+}
+
+// CreateNewLicenseRequest creates a new license request
+func (u *licenseUsecase) CreateNewLicenseRequest(userID uint, req dto.NewLicenseRequestRequest) (*dto.LicenseRequestResponse, error) {
+	// Generate request number
+	requestNumber := u.generateRequestNumber()
+
+	// Parse capacity
+	capacity, err := strconv.ParseFloat(req.Capacity, 64)
+	if err != nil {
+		capacity = 0
+	}
+
+	// Parse expected start date
+	expectedStartDate, err := time.Parse("2006-01-02", req.ExpectedStartDate)
+	if err != nil {
+		expectedStartDate = time.Now()
+	}
+
+	// Create new license request
+	newLicenseRequest := &models.NewLicenseRequest{
+		UserID:            userID,
+		RequestNumber:     requestNumber,
+		Status:            models.StatusNewRequest,
+		LicenseType:       req.LicenseType,
+		ProjectName:       req.ProjectName,
+		ProjectAddress:    req.ProjectAddress,
+		Province:          req.Province,
+		District:          req.District,
+		Subdistrict:       req.Subdistrict,
+		PostalCode:        req.PostalCode,
+		EnergyType:        req.EnergyType,
+		Capacity:          capacity,
+		CapacityUnit:      req.CapacityUnit,
+		ExpectedStartDate: expectedStartDate,
+		Description:       req.Description,
+		ContactPerson:     req.ContactPerson,
+		ContactPhone:      req.ContactPhone,
+		ContactEmail:      req.ContactEmail,
+		Deadline:          GetDeadlinePointer(),
+	}
+
+	if err := u.newLicenseRepo.Create(newLicenseRequest); err != nil {
+		return nil, errors.New("failed to create new license request")
+	}
+
+	// Convert to response format
+	response := &dto.LicenseRequestResponse{
+		ID:            newLicenseRequest.ID,
+		RequestNumber: newLicenseRequest.RequestNumber,
+		LicenseType:   newLicenseRequest.LicenseType,
+		Status:        string(newLicenseRequest.Status),
+		Title:         newLicenseRequest.ProjectName,
+		Description:   newLicenseRequest.Description,
+		Location:      newLicenseRequest.ProjectAddress + ", " + newLicenseRequest.District + ", " + newLicenseRequest.Subdistrict + ", " + newLicenseRequest.Province + " " + newLicenseRequest.PostalCode,
+		CreatedAt:     newLicenseRequest.CreatedAt,
+		UpdatedAt:     newLicenseRequest.UpdatedAt,
+		UserID:        newLicenseRequest.UserID,
+	}
+
+	return response, nil
+}
+
+// CreateRenewalLicenseRequest creates a renewal license request
+func (u *licenseUsecase) CreateRenewalLicenseRequest(userID uint, req dto.RenewalLicenseRequestRequest) (*dto.LicenseRequestResponse, error) {
+	// Generate request number
+	requestNumber := u.generateRequestNumber()
+
+	// Parse capacities
+	currentCapacity, err := strconv.ParseFloat(req.CurrentCapacity, 64)
+	if err != nil {
+		currentCapacity = 0
+	}
+
+	requestedCapacity, err := strconv.ParseFloat(req.RequestedCapacity, 64)
+	if err != nil {
+		requestedCapacity = 0
+	}
+
+	// Parse dates
+	expiryDate, err := time.Parse("2006-01-02", req.ExpiryDate)
+	if err != nil {
+		expiryDate = time.Now()
+	}
+
+	requestedExpiryDate, err := time.Parse("2006-01-02", req.RequestedExpiryDate)
+	if err != nil {
+		requestedExpiryDate = time.Now()
+	}
+
+	// Create renewal license request
+	renewalLicenseRequest := &models.RenewalLicenseRequest{
+		UserID:                userID,
+		RequestNumber:         requestNumber,
+		Status:                models.StatusNewRequest,
+		LicenseType:           req.LicenseType,
+		LicenseNumber:         req.LicenseNumber,
+		ProjectName:           req.ProjectName,
+		ProjectAddress:        req.ProjectAddress,
+		CurrentCapacity:       currentCapacity,
+		CurrentCapacityUnit:   req.CurrentCapacityUnit,
+		RequestedCapacity:     requestedCapacity,
+		RequestedCapacityUnit: req.RequestedCapacityUnit,
+		ExpiryDate:            expiryDate,
+		RequestedExpiryDate:   requestedExpiryDate,
+		Reason:                req.Reason,
+		ContactPerson:         req.ContactPerson,
+		ContactPhone:          req.ContactPhone,
+		ContactEmail:          req.ContactEmail,
+		Deadline:              GetDeadlinePointer(),
+	}
+
+	if err := u.renewalLicenseRepo.Create(renewalLicenseRequest); err != nil {
+		return nil, errors.New("failed to create renewal license request")
+	}
+
+	// Convert to response format
+	response := &dto.LicenseRequestResponse{
+		ID:            renewalLicenseRequest.ID,
+		RequestNumber: renewalLicenseRequest.RequestNumber,
+		LicenseType:   renewalLicenseRequest.LicenseType,
+		Status:        string(renewalLicenseRequest.Status),
+		Title:         renewalLicenseRequest.ProjectName,
+		Description:   renewalLicenseRequest.Reason,
+		Location:      renewalLicenseRequest.ProjectAddress,
+		CreatedAt:     renewalLicenseRequest.CreatedAt,
+		UpdatedAt:     renewalLicenseRequest.UpdatedAt,
+		UserID:        renewalLicenseRequest.UserID,
+	}
+
+	return response, nil
+}
+
+// CreateExtensionLicenseRequest creates an extension license request
+func (u *licenseUsecase) CreateExtensionLicenseRequest(userID uint, req dto.ExtensionLicenseRequestRequest) (*dto.LicenseRequestResponse, error) {
+	// Generate request number
+	requestNumber := u.generateRequestNumber()
+
+	// Parse capacities
+	currentCapacity, err := strconv.ParseFloat(req.CurrentCapacity, 64)
+	if err != nil {
+		currentCapacity = 0
+	}
+
+	requestedCapacity, err := strconv.ParseFloat(req.RequestedCapacity, 64)
+	if err != nil {
+		requestedCapacity = 0
+	}
+
+	// Parse expected start date
+	expectedStartDate, err := time.Parse("2006-01-02", req.ExpectedStartDate)
+	if err != nil {
+		expectedStartDate = time.Now()
+	}
+
+	// Create extension license request
+	extensionLicenseRequest := &models.ExtensionLicenseRequest{
+		UserID:                userID,
+		RequestNumber:         requestNumber,
+		Status:                models.StatusNewRequest,
+		LicenseType:           req.LicenseType,
+		LicenseNumber:         req.LicenseNumber,
+		ProjectName:           req.ProjectName,
+		CurrentCapacity:       currentCapacity,
+		CurrentCapacityUnit:   req.CurrentCapacityUnit,
+		RequestedCapacity:     requestedCapacity,
+		RequestedCapacityUnit: req.RequestedCapacityUnit,
+		ExtensionReason:       req.ExtensionReason,
+		ExpectedStartDate:     expectedStartDate,
+		Description:           req.Description,
+		ContactPerson:         req.ContactPerson,
+		ContactPhone:          req.ContactPhone,
+		ContactEmail:          req.ContactEmail,
+		Deadline:              GetDeadlinePointer(),
+	}
+
+	if err := u.extensionLicenseRepo.Create(extensionLicenseRequest); err != nil {
+		return nil, errors.New("failed to create extension license request")
+	}
+
+	// Convert to response format
+	response := &dto.LicenseRequestResponse{
+		ID:            extensionLicenseRequest.ID,
+		RequestNumber: extensionLicenseRequest.RequestNumber,
+		LicenseType:   extensionLicenseRequest.LicenseType,
+		Status:        string(extensionLicenseRequest.Status),
+		Title:         extensionLicenseRequest.ProjectName,
+		Description:   extensionLicenseRequest.Description,
+		CreatedAt:     extensionLicenseRequest.CreatedAt,
+		UpdatedAt:     extensionLicenseRequest.UpdatedAt,
+		UserID:        extensionLicenseRequest.UserID,
+	}
+
+	return response, nil
+}
+
+// CreateReductionLicenseRequest creates a reduction license request
+func (u *licenseUsecase) CreateReductionLicenseRequest(userID uint, req dto.ReductionLicenseRequestRequest) (*dto.LicenseRequestResponse, error) {
+	// Generate request number
+	requestNumber := u.generateRequestNumber()
+
+	// Parse capacities
+	currentCapacity, err := strconv.ParseFloat(req.CurrentCapacity, 64)
+	if err != nil {
+		currentCapacity = 0
+	}
+
+	requestedCapacity, err := strconv.ParseFloat(req.RequestedCapacity, 64)
+	if err != nil {
+		requestedCapacity = 0
+	}
+
+	// Parse expected start date
+	expectedStartDate, err := time.Parse("2006-01-02", req.ExpectedStartDate)
+	if err != nil {
+		expectedStartDate = time.Now()
+	}
+
+	// Create reduction license request
+	reductionLicenseRequest := &models.ReductionLicenseRequest{
+		UserID:                userID,
+		RequestNumber:         requestNumber,
+		Status:                models.StatusNewRequest,
+		LicenseType:           req.LicenseType,
+		LicenseNumber:         req.LicenseNumber,
+		ProjectName:           req.ProjectName,
+		CurrentCapacity:       currentCapacity,
+		CurrentCapacityUnit:   req.CurrentCapacityUnit,
+		RequestedCapacity:     requestedCapacity,
+		RequestedCapacityUnit: req.RequestedCapacityUnit,
+		ReductionReason:       req.ReductionReason,
+		ExpectedStartDate:     expectedStartDate,
+		Description:           req.Description,
+		ContactPerson:         req.ContactPerson,
+		ContactPhone:          req.ContactPhone,
+		ContactEmail:          req.ContactEmail,
+		Deadline:              GetDeadlinePointer(),
+	}
+
+	if err := u.reductionLicenseRepo.Create(reductionLicenseRequest); err != nil {
+		return nil, errors.New("failed to create reduction license request")
+	}
+
+	// Convert to response format
+	response := &dto.LicenseRequestResponse{
+		ID:            reductionLicenseRequest.ID,
+		RequestNumber: reductionLicenseRequest.RequestNumber,
+		LicenseType:   reductionLicenseRequest.LicenseType,
+		Status:        string(reductionLicenseRequest.Status),
+		Title:         reductionLicenseRequest.ProjectName,
+		Description:   reductionLicenseRequest.Description,
+		CreatedAt:     reductionLicenseRequest.CreatedAt,
+		UpdatedAt:     reductionLicenseRequest.UpdatedAt,
+		UserID:        reductionLicenseRequest.UserID,
 	}
 
 	return response, nil

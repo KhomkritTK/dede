@@ -21,8 +21,19 @@ type LicenseHandler struct {
 
 func NewLicenseHandler(db *gorm.DB, config *config.Config) *LicenseHandler {
 	licenseRepo := repository.NewLicenseRequestRepository(db)
+	newLicenseRepo := repository.NewNewLicenseRepo(db)
+	renewalLicenseRepo := repository.NewRenewalLicenseRepo(db)
+	extensionLicenseRepo := repository.NewExtensionLicenseRepo(db)
+	reductionLicenseRepo := repository.NewReductionLicenseRepo(db)
 	userRepo := repository.NewUserRepository(db)
-	licenseUsecase := usecase.NewLicenseUsecase(licenseRepo, userRepo)
+	licenseUsecase := usecase.NewLicenseUsecase(
+		licenseRepo,
+		newLicenseRepo,
+		renewalLicenseRepo,
+		extensionLicenseRepo,
+		reductionLicenseRepo,
+		userRepo,
+	)
 
 	return &LicenseHandler{
 		licenseUsecase: licenseUsecase,
@@ -320,4 +331,120 @@ func (h *LicenseHandler) GetMyLicenseRequests(c *gin.Context) {
 func (h *LicenseHandler) GetLicenseTypes(c *gin.Context) {
 	response := h.licenseUsecase.GetLicenseTypes()
 	utils.SuccessOK(c, "License types retrieved successfully", response)
+}
+
+// CreateNewLicenseRequest handles creating a new license request
+func (h *LicenseHandler) CreateNewLicenseRequest(c *gin.Context) {
+	var req dto.NewLicenseRequestRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.ErrorBadRequest(c, "Invalid request body", err)
+		return
+	}
+
+	userID, exists := c.Get("user_id")
+	if !exists {
+		utils.ErrorUnauthorized(c, "User not authenticated", nil)
+		return
+	}
+
+	id, ok := userID.(uint)
+	if !ok {
+		utils.ErrorInternalServerError(c, "Invalid user ID", nil)
+		return
+	}
+
+	response, err := h.licenseUsecase.CreateNewLicenseRequest(id, req)
+	if err != nil {
+		utils.ErrorBadRequest(c, err.Error(), nil)
+		return
+	}
+
+	utils.SuccessCreated(c, "License request created successfully", response)
+}
+
+// CreateRenewalLicenseRequest handles creating a renewal license request
+func (h *LicenseHandler) CreateRenewalLicenseRequest(c *gin.Context) {
+	var req dto.RenewalLicenseRequestRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.ErrorBadRequest(c, "Invalid request body", err)
+		return
+	}
+
+	userID, exists := c.Get("user_id")
+	if !exists {
+		utils.ErrorUnauthorized(c, "User not authenticated", nil)
+		return
+	}
+
+	id, ok := userID.(uint)
+	if !ok {
+		utils.ErrorInternalServerError(c, "Invalid user ID", nil)
+		return
+	}
+
+	response, err := h.licenseUsecase.CreateRenewalLicenseRequest(id, req)
+	if err != nil {
+		utils.ErrorBadRequest(c, err.Error(), nil)
+		return
+	}
+
+	utils.SuccessCreated(c, "License request created successfully", response)
+}
+
+// CreateExtensionLicenseRequest handles creating an extension license request
+func (h *LicenseHandler) CreateExtensionLicenseRequest(c *gin.Context) {
+	var req dto.ExtensionLicenseRequestRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.ErrorBadRequest(c, "Invalid request body", err)
+		return
+	}
+
+	userID, exists := c.Get("user_id")
+	if !exists {
+		utils.ErrorUnauthorized(c, "User not authenticated", nil)
+		return
+	}
+
+	id, ok := userID.(uint)
+	if !ok {
+		utils.ErrorInternalServerError(c, "Invalid user ID", nil)
+		return
+	}
+
+	response, err := h.licenseUsecase.CreateExtensionLicenseRequest(id, req)
+	if err != nil {
+		utils.ErrorBadRequest(c, err.Error(), nil)
+		return
+	}
+
+	utils.SuccessCreated(c, "License request created successfully", response)
+}
+
+// CreateReductionLicenseRequest handles creating a reduction license request
+func (h *LicenseHandler) CreateReductionLicenseRequest(c *gin.Context) {
+	var req dto.ReductionLicenseRequestRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.ErrorBadRequest(c, "Invalid request body", err)
+		return
+	}
+
+	userID, exists := c.Get("user_id")
+	if !exists {
+		utils.ErrorUnauthorized(c, "User not authenticated", nil)
+		return
+	}
+
+	id, ok := userID.(uint)
+	if !ok {
+		utils.ErrorInternalServerError(c, "Invalid user ID", nil)
+		return
+	}
+
+	response, err := h.licenseUsecase.CreateReductionLicenseRequest(id, req)
+	if err != nil {
+		utils.ErrorBadRequest(c, err.Error(), nil)
+		return
+	}
+
+	utils.SuccessCreated(c, "License request created successfully", response)
 }

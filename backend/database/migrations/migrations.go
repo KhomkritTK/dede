@@ -9,7 +9,15 @@ import (
 func Migrate(db *gorm.DB) error {
 	return db.AutoMigrate(
 		&models.User{},
+		&models.Corporate{},
+		&models.CorporateMember{},
+		&models.UserProfile{},
+		&models.OTP{},
 		&models.LicenseRequest{},
+		&models.NewLicenseRequest{},
+		&models.RenewalLicenseRequest{},
+		&models.ExtensionLicenseRequest{},
+		&models.ReductionLicenseRequest{},
 		&models.Inspection{},
 		&models.AuditReport{},
 		&models.Attachment{},

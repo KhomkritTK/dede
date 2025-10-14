@@ -29,6 +29,77 @@ type CreateLicenseRequestRequest struct {
 	Location          string  `json:"location" binding:"required"`
 }
 
+// NewLicenseRequestRequest represents the new license request payload
+type NewLicenseRequestRequest struct {
+	LicenseType       string `json:"licenseType" binding:"required"`
+	ProjectName       string `json:"projectName" binding:"required"`
+	ProjectAddress    string `json:"projectAddress" binding:"required"`
+	Province          string `json:"province" binding:"required"`
+	District          string `json:"district" binding:"required"`
+	Subdistrict       string `json:"subdistrict" binding:"required"`
+	PostalCode        string `json:"postalCode" binding:"required"`
+	EnergyType        string `json:"energyType" binding:"required"`
+	Capacity          string `json:"capacity" binding:"required"`
+	CapacityUnit      string `json:"capacityUnit" binding:"required"`
+	ExpectedStartDate string `json:"expectedStartDate" binding:"required"`
+	ContactPerson     string `json:"contactPerson" binding:"required"`
+	ContactPhone      string `json:"contactPhone" binding:"required"`
+	ContactEmail      string `json:"contactEmail" binding:"required"`
+	Description       string `json:"description" binding:"required"`
+}
+
+// RenewalLicenseRequestRequest represents the renewal license request payload
+type RenewalLicenseRequestRequest struct {
+	LicenseType           string `json:"licenseType" binding:"required"`
+	LicenseNumber         string `json:"licenseNumber" binding:"required"`
+	ProjectName           string `json:"projectName" binding:"required"`
+	ProjectAddress        string `json:"projectAddress" binding:"required"`
+	CurrentCapacity       string `json:"currentCapacity" binding:"required"`
+	CurrentCapacityUnit   string `json:"currentCapacityUnit" binding:"required"`
+	RequestedCapacity     string `json:"requestedCapacity" binding:"required"`
+	RequestedCapacityUnit string `json:"requestedCapacityUnit" binding:"required"`
+	ExpiryDate            string `json:"expiryDate" binding:"required"`
+	RequestedExpiryDate   string `json:"requestedExpiryDate" binding:"required"`
+	ContactPerson         string `json:"contactPerson" binding:"required"`
+	ContactPhone          string `json:"contactPhone" binding:"required"`
+	ContactEmail          string `json:"contactEmail" binding:"required"`
+	Reason                string `json:"reason" binding:"required"`
+}
+
+// ExtensionLicenseRequestRequest represents the extension license request payload
+type ExtensionLicenseRequestRequest struct {
+	LicenseType           string `json:"licenseType" binding:"required"`
+	LicenseNumber         string `json:"licenseNumber" binding:"required"`
+	ProjectName           string `json:"projectName" binding:"required"`
+	CurrentCapacity       string `json:"currentCapacity" binding:"required"`
+	CurrentCapacityUnit   string `json:"currentCapacityUnit" binding:"required"`
+	RequestedCapacity     string `json:"requestedCapacity" binding:"required"`
+	RequestedCapacityUnit string `json:"requestedCapacityUnit" binding:"required"`
+	ExtensionReason       string `json:"extensionReason" binding:"required"`
+	ExpectedStartDate     string `json:"expectedStartDate" binding:"required"`
+	ContactPerson         string `json:"contactPerson" binding:"required"`
+	ContactPhone          string `json:"contactPhone" binding:"required"`
+	ContactEmail          string `json:"contactEmail" binding:"required"`
+	Description           string `json:"description" binding:"required"`
+}
+
+// ReductionLicenseRequestRequest represents the reduction license request payload
+type ReductionLicenseRequestRequest struct {
+	LicenseType           string `json:"licenseType" binding:"required"`
+	LicenseNumber         string `json:"licenseNumber" binding:"required"`
+	ProjectName           string `json:"projectName" binding:"required"`
+	CurrentCapacity       string `json:"currentCapacity" binding:"required"`
+	CurrentCapacityUnit   string `json:"currentCapacityUnit" binding:"required"`
+	RequestedCapacity     string `json:"requestedCapacity" binding:"required"`
+	RequestedCapacityUnit string `json:"requestedCapacityUnit" binding:"required"`
+	ReductionReason       string `json:"reductionReason" binding:"required"`
+	ExpectedStartDate     string `json:"expectedStartDate" binding:"required"`
+	ContactPerson         string `json:"contactPerson" binding:"required"`
+	ContactPhone          string `json:"contactPhone" binding:"required"`
+	ContactEmail          string `json:"contactEmail" binding:"required"`
+	Description           string `json:"description" binding:"required"`
+}
+
 // UpdateLicenseRequestRequest represents the update license request payload
 type UpdateLicenseRequestRequest struct {
 	Title             string  `json:"title"`
