@@ -41,6 +41,21 @@
       "static/chunks/main-app.js",
       "static/chunks/app/admin-portal/services/[id]/page.js"
     ],
+    "/eservice/dede/home/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/eservice/dede/home/page.js"
+    ],
+    "/eservice/dede/services/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/eservice/dede/services/page.js"
+    ],
+    "/eservice/dede/about/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/eservice/dede/about/page.js"
+    ],
     "/not-found": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
