@@ -227,6 +227,15 @@ export default function LoginPage() {
               </div>
             </div>
             
+            <div className="flex justify-center">
+              <div className="bg-white p-4 rounded-lg shadow-md">
+                <p className="text-sm text-secondary-600 mb-2 text-center">สแกน QR Code เพื่อเข้าสู่ระบบ</p>
+                <div className="w-32 h-32 bg-gray-200 rounded flex items-center justify-center">
+                  <span className="text-gray-500 text-xs">QR Code</span>
+                </div>
+              </div>
+            </div>
+            
             <div className="space-y-3">
               <button
                 type="button"

@@ -44,7 +44,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const handleLogout = async () => {
     await logout()
-    router.push('/login')
+    router.push('/')
   }
 
   if (!isAuthenticated) {

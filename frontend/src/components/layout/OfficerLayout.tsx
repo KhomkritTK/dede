@@ -29,7 +29,7 @@ export default function OfficerLayout({ children }: OfficerLayoutProps) {
 
   const handleLogout = async () => {
     await logout()
-    router.push('/login')
+    router.push('/')
   }
 
   const navigation = [

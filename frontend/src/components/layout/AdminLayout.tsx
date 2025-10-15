@@ -30,7 +30,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const handleLogout = async () => {
     await logout()
-    router.push('/login-portal')
+    router.push('/')
   }
 
   const navigation = [

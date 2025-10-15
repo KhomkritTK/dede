@@ -16,7 +16,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
 
   const handleLogout = async () => {
     await logout()
-    router.push('/eservice/dede')
+    router.push('/')
   }
 
   return (
@@ -35,18 +35,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                 </Link>
               </div>
               <nav className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                <Link href="/eservice/dede/home" className="border-transparent text-gray-600 hover:border-green-500 hover:text-green-600 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium font-sans transition-colors duration-200">
-                  หน้าแรก
-                </Link>
-                <Link href="/eservice/dede/services" className="border-transparent text-gray-600 hover:border-green-500 hover:text-green-600 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium font-sans transition-colors duration-200">
-                  บริการ
-                </Link>
-                <Link href="/eservice/dede/about" className="border-transparent text-gray-600 hover:border-green-500 hover:text-green-600 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium font-sans transition-colors duration-200">
-                  เกี่ยวกับเรา
-                </Link>
-                <Link href="/eservice/dede/contact" className="border-transparent text-gray-600 hover:border-green-500 hover:text-green-600 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium font-sans transition-colors duration-200">
-                  ติดต่อเรา
-                </Link>
+                {/* Contact Us link removed */}
               </nav>
             </div>
             <div className="flex items-center">
@@ -114,18 +103,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
         {isMenuOpen && (
           <div className="sm:hidden bg-white shadow-lg">
             <div className="pt-2 pb-3 space-y-1">
-              <Link href="/eservice/dede/home" className="border-transparent text-gray-600 hover:bg-green-50 hover:border-green-500 hover:text-green-600 block pl-3 pr-4 py-2 border-l-4 text-base font-medium font-sans transition-colors duration-200">
-                หน้าแรก
-              </Link>
-              <Link href="/eservice/dede/services" className="border-transparent text-gray-600 hover:bg-green-50 hover:border-green-500 hover:text-green-600 block pl-3 pr-4 py-2 border-l-4 text-base font-medium font-sans transition-colors duration-200">
-                บริการ
-              </Link>
-              <Link href="/eservice/dede/about" className="border-transparent text-gray-600 hover:bg-green-50 hover:border-green-500 hover:text-green-600 block pl-3 pr-4 py-2 border-l-4 text-base font-medium font-sans transition-colors duration-200">
-                เกี่ยวกับเรา
-              </Link>
-              <Link href="/eservice/dede/contact" className="border-transparent text-gray-600 hover:bg-green-50 hover:border-green-500 hover:text-green-600 block pl-3 pr-4 py-2 border-l-4 text-base font-medium font-sans transition-colors duration-200">
-                ติดต่อเรา
-              </Link>
+              {/* Contact Us link removed */}
             </div>
             <div className="pt-4 pb-3 border-t border-gray-200">
               {isAuthenticated ? (
@@ -204,43 +182,12 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
             </div>
             <div className="mt-12 grid grid-cols-2 gap-8 xl:mt-0 xl:col-span-2">
               <div className="md:grid md:grid-cols-2 md:gap-8">
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase font-sans">
-                    บริการ
-                  </h3>
-                  <ul className="mt-4 space-y-4">
-                    <li>
-                      <Link href="/eservice/dede/services" className="text-base text-gray-300 hover:text-white font-sans transition-colors duration-200">
-                        คำขอใบอนุญาต
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/eservice/dede/services" className="text-base text-gray-300 hover:text-white font-sans transition-colors duration-200">
-                        ติดตามสถานะ
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/eservice/dede/services" className="text-base text-gray-300 hover:text-white font-sans transition-colors duration-200">
-                        ดาวน์โหลดเอกสาร
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
                 <div className="mt-12 md:mt-0">
                   <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase font-sans">
                     ข้อมูล
                   </h3>
                   <ul className="mt-4 space-y-4">
-                    <li>
-                      <Link href="/eservice/dede/about" className="text-base text-gray-300 hover:text-white font-sans transition-colors duration-200">
-                        เกี่ยวกับเรา
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/eservice/dede/contact" className="text-base text-gray-300 hover:text-white font-sans transition-colors duration-200">
-                        ติดต่อเรา
-                      </Link>
-                    </li>
+                    {/* Contact Us link removed */}
                     <li>
                       {isAuthenticated ? (
                         <button

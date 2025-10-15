@@ -446,7 +446,7 @@ export default function ProductionReductionPage() {
           <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
             <button
               type="button"
-              onClick={() => router.push('/eservice/dede/dashboard')}
+              onClick={() => router.push('/eservice/dede/home')}
               className="px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
             >
               ยกเลิก
