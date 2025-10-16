@@ -6,45 +6,50 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/page": [
+    "/eservice/dede/home/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
-    ],
-    "/admin-portal/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin-portal/page.js"
+      "static/chunks/app/eservice/dede/home/page.js"
     ],
     "/admin-portal/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/admin-portal/layout.js"
     ],
+    "/admin-portal/services/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin-portal/services/page.js"
+    ],
     "/admin-portal/dashboard/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/admin-portal/dashboard/page.js"
     ],
-    "/admin-portal/services/page": [
+    "/web-portal/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin-portal/services/page.js"
+      "static/chunks/app/web-portal/page.js"
+    ],
+    "/eservice/dede/requests/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/eservice/dede/requests/[id]/page.js"
     ],
     "/admin-portal/services/[id]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/admin-portal/services/[id]/page.js"
     ],
-    "/login-portal/page": [
+    "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/login-portal/page.js"
+      "static/chunks/app/page.js"
     ],
-    "/admin-portal/flow/page": [
+    "/eservice/dede/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin-portal/flow/page.js"
+      "static/chunks/app/eservice/dede/page.js"
     ]
   }
 }

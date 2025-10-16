@@ -16,16 +16,26 @@ import {
   PlusIcon,
   ArrowRightIcon,
   SparklesIcon,
+  PencilIcon,
+  EyeIcon,
+  InformationCircleIcon,
 } from '@heroicons/react/24/outline'
 
-interface UserRequest {
-  id: string
-  requestNumber: string
-  type: 'new_license' | 'renewal' | 'extension' | 'reduction'
+interface UnifiedLicenseRequest {
+  id: number
+  request_number: string
+  license_type: string
+  status: string
   title: string
-  status: 'new_request' | 'accepted' | 'assigned' | 'appointment' | 'inspecting' | 'inspection_done' | 'document_edit' | 'report_approved' | 'approved' | 'rejected' | 'rejected_final' | 'returned' | 'forwarded'
-  submittedDate: string
-  lastUpdated: string
+  description: string
+  request_date: string
+  user_id: number
+  user: {
+    id: number
+    username: string
+    full_name: string
+    email: string
+  }
 }
 
 export default function UserDashboardPage() {
@@ -56,11 +66,11 @@ export default function UserDashboardPage() {
     }
   }, [isAuthenticated, isLoading, router, user])
 
-  // Fetch user requests
+  // Fetch license requests from admin portal services
   const { data: requests, isLoading: requestsLoading, refetch } = useQuery({
-    queryKey: ['user-requests'],
+    queryKey: ['admin-license-requests'],
     queryFn: async () => {
-      const response = await apiClient.get<UserRequest[]>('/api/v1/user/requests')
+      const response = await apiClient.get<UnifiedLicenseRequest[]>('/api/v1/admin-portal/services/requests')
       return response.data
     },
     enabled: isAuthenticated,
@@ -165,10 +175,10 @@ export default function UserDashboardPage() {
     }
   }
 
-  const getTypeText = (type: string) => {
+  const getLicenseTypeDisplayName = (type: string) => {
     switch (type) {
-      case 'new_license':
-        return 'ขอรับใบอนุญาต'
+      case 'new':
+        return 'ขอรับใบอนุญาตใหม่'
       case 'renewal':
         return 'ขอต่ออายุใบอนุญาต'
       case 'extension':
@@ -177,6 +187,38 @@ export default function UserDashboardPage() {
         return 'ขอลดการผลิต'
       default:
         return type
+    }
+  }
+
+  const getFlowStep = (status: string) => {
+    switch (status) {
+      case 'new_request':
+        return 'รอการตรวจสอบเอกสารเบื้องต้น'
+      case 'accepted':
+        return 'เอกสารผ่านการตรวจสอบเบื้องต้น'
+      case 'assigned':
+        return 'มอบหมายให้เจ้าหน้าที่ตรวจสอบ'
+      case 'appointment':
+        return 'นัดหมายวันเข้าตรวจสอบระบบ'
+      case 'inspecting':
+        return 'กำลังดำเนินการตรวจสอบระบบ'
+      case 'inspection_done':
+        return 'ตรวจสอบระบบเสร็จสิ้น'
+      case 'document_edit':
+        return 'รอการแก้ไขเอกสาร'
+      case 'report_approved':
+        return 'รายงานผลการตรวจสอบได้รับการอนุมัติ'
+      case 'approved':
+        return 'อนุมัติใบอนุญาตแล้ว'
+      case 'rejected':
+      case 'rejected_final':
+        return 'คำขอถูกปฏิเสธ'
+      case 'returned':
+        return 'เอกสารถูกตีกลับเพื่อแก้ไข'
+      case 'forwarded':
+        return 'ส่งเรื่องให้ DEDE Head พิจารณา'
+      default:
+        return 'กำลังดำเนินการ'
     }
   }
 
@@ -248,14 +290,14 @@ export default function UserDashboardPage() {
           </div>
         </div>
 
-        {/* Recent Requests */}
+        {/* Document Status Viewer */}
         <div className="bg-white shadow-xl rounded-xl overflow-hidden transform transition-all duration-300 hover:shadow-2xl hover-lift animate-fade-in">
           <div className="px-6 py-5 sm:p-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
             <div className="flex items-center">
               <div className="h-8 w-8 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg flex items-center justify-center mr-3">
                 <DocumentTextIcon className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 font-sans">คำขอล่าสุด</h3>
+              <h3 className="text-xl font-semibold text-gray-900 font-sans">สถานะเอกสาร (Web Portal)</h3>
             </div>
           </div>
           <div className="overflow-hidden">
@@ -268,40 +310,81 @@ export default function UserDashboardPage() {
               <ul className="divide-y divide-gray-100">
                 {requests.map((request) => (
                   <li key={request.id} className="transform transition-all duration-200 hover:bg-gray-50 hover:scale-[1.01]">
-                    <Link href={`/eservice/dede/requests/${request.id}`} className="block">
-                      <div className="px-6 py-5 sm:px-6">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <div className="flex-shrink-0 mr-4 p-2 bg-gray-50 rounded-lg">
-                              {getStatusIcon(request.status)}
-                            </div>
-                            <div>
+                    <div className="px-6 py-5 sm:px-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center flex-1">
+                          <div className="flex-shrink-0 mr-4 p-2 bg-gray-50 rounded-lg">
+                            {getStatusIcon(request.status)}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between">
                               <p className="text-sm font-semibold text-blue-600 font-sans">
-                                {request.requestNumber}
+                                {request.request_number}
                               </p>
-                              <p className="text-base font-medium text-gray-900 font-sans mt-1">
-                                {request.title}
-                              </p>
-                              <div className="flex items-center mt-2 space-x-3">
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 font-sans">
-                                  {getTypeText(request.type)}
-                                </span>
-                                <span className="text-xs text-gray-500 font-sans flex items-center">
-                                  <ClockIcon className="h-3 w-3 mr-1" />
-                                  ส่งเมื่อ {request.submittedDate}
-                                </span>
+                              <div className="flex items-center space-x-2">
+                                {request.status === 'returned' && (
+                                  <Link
+                                    href={`/eservice/dede/requests/${request.id}`}
+                                    className="inline-flex items-center px-3 py-1 border border-orange-300 shadow-sm text-xs leading-4 font-medium rounded-md text-orange-700 bg-white hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                                  >
+                                    <PencilIcon className="h-3 w-3 mr-1" />
+                                    แก้ไขเอกสาร
+                                  </Link>
+                                )}
+                                <Link
+                                  href={`/eservice/dede/requests/${request.id}`}
+                                  className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                >
+                                  <EyeIcon className="h-3 w-3 mr-1" />
+                                  ดูรายละเอียด
+                                </Link>
+                              </div>
+                            </div>
+                            <p className="text-base font-medium text-gray-900 font-sans mt-1">
+                              {request.title}
+                            </p>
+                            <div className="flex items-center mt-2 space-x-3">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 font-sans">
+                                {getLicenseTypeDisplayName(request.license_type)}
+                              </span>
+                              <span className="text-xs text-gray-500 font-sans flex items-center">
+                                <ClockIcon className="h-3 w-3 mr-1" />
+                                ส่งเมื่อ {new Date(request.request_date).toLocaleDateString('th-TH')}
+                              </span>
+                              <span className="text-xs text-gray-500 font-sans">
+                                ผู้ยื่น: {request.user.full_name}
+                              </span>
+                            </div>
+                            {request.status === 'returned' && (
+                              <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-md">
+                                <div className="flex items-start">
+                                  <InformationCircleIcon className="h-4 w-4 text-amber-600 mt-0.5 mr-2 flex-shrink-0" />
+                                  <div className="text-xs text-amber-800">
+                                    <p className="font-medium">เอกสารถูกตีกลับเพื่อแก้ไข</p>
+                                    <p className="mt-1">กรุณาแก้ไขเอกสารตามที่ระบุและส่งใหม่อีกครั้ง</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                              <div className="flex items-start">
+                                <InformationCircleIcon className="h-4 w-4 text-blue-600 mt-0.5 mr-2 flex-shrink-0" />
+                                <div className="text-xs text-blue-800">
+                                  <p className="font-medium">สถานะปัจจุบัน: {getStatusText(request.status)}</p>
+                                  <p className="mt-1">เอกสารอยู่ในขั้นตอน: {getFlowStep(request.status)}</p>
+                                </div>
                               </div>
                             </div>
                           </div>
-                          <div className="ml-4 flex-shrink-0">
-                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium font-sans shadow-sm ${getStatusColor(request.status)}`}>
-                              {getStatusIcon(request.status)}
-                              <span className="ml-1">{getStatusText(request.status)}</span>
-                            </span>
-                          </div>
+                        </div>
+                        <div className="ml-4 flex-shrink-0">
+                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium font-sans shadow-sm ${getStatusColor(request.status)}`}>
+                            {getStatusIcon(request.status)}
+                            <span className="ml-1">{getStatusText(request.status)}</span>
+                          </span>
                         </div>
                       </div>
-                    </Link>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -310,9 +393,9 @@ export default function UserDashboardPage() {
                 <div className="mx-auto h-20 w-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                   <DocumentTextIcon className="h-10 w-10 text-gray-400" />
                 </div>
-                <h3 className="mt-4 text-lg font-medium text-gray-900 font-sans">ไม่มีคำขอ</h3>
+                <h3 className="mt-4 text-lg font-medium text-gray-900 font-sans">ไม่มีเอกสาร</h3>
                 <p className="mt-2 text-base text-gray-600 font-sans max-w-md mx-auto">
-                  คุณยังไม่ได้ส่งคำขอใดๆ เริ่มต้นโดยสร้างคำขอใบอนุญาตใหม่
+                  คุณยังไม่ได้ส่งคำขอใดๆ สำหรับ Web Portal
                 </p>
                 <div className="mt-8">
                   <Link
@@ -328,13 +411,15 @@ export default function UserDashboardPage() {
           </div>
           {requests && requests.length > 0 && (
             <div className="px-6 py-4 sm:px-6 bg-gray-50 text-right">
-              <Link
-                href="/eservice/dede/requests"
+              <a
+                href="/web-portal"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-500 font-sans transition-colors duration-200"
               >
-                ดูคำขอทั้งหมด
+                ดูสถานะใน Web Portal
                 <ArrowRightIcon className="h-4 w-4 ml-1" />
-              </Link>
+              </a>
             </div>
           )}
         </div>
