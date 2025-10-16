@@ -352,18 +352,28 @@ export function PortalAuthProvider({ children }: { children: ReactNode }) {
 
   const refreshProfile = async () => {
     try {
-      const response = await authService.getProfile()
-      
-      if (response.success && response.data) {
-        // Update portal-specific user data
-        if (typeof window !== 'undefined') {
-          localStorage.setItem(PORTAL_USER_KEY, JSON.stringify(response.data))
+      // Use the portal-specific getProfile method
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/v1/auth/profile`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem(PORTAL_TOKEN_KEY)}`
         }
-        
-        setAuthState(prev => ({
-          ...prev,
-          user: response.data || null,
-        }))
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success && data.data) {
+          // Update portal-specific user data
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(PORTAL_USER_KEY, JSON.stringify(data.data))
+          }
+          
+          setAuthState(prev => ({
+            ...prev,
+            user: data.data || null,
+          }))
+        }
       }
     } catch (error) {
       console.error('Failed to refresh profile:', error)

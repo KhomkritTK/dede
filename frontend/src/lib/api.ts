@@ -16,7 +16,17 @@ class ApiClient {
     this.client.interceptors.request.use(
       (config) => {
         if (typeof window !== 'undefined') {
-          const token = localStorage.getItem('token')
+          // Check for portal token first for portal-specific routes
+          const isPortalRoute = config.url?.includes('/admin-portal') ||
+                               config.url?.includes('/officer') ||
+                               window.location.pathname.startsWith('/admin-portal') ||
+                               window.location.pathname.startsWith('/eservice/dede/officer') ||
+                               window.location.pathname.startsWith('/login-portal') ||
+                               window.location.pathname.startsWith('/web-portal')
+          
+          const tokenKey = isPortalRoute ? 'portal_token' : 'token'
+          const token = localStorage.getItem(tokenKey)
+          
           if (token) {
             config.headers.Authorization = `Bearer ${token}`
           }
@@ -35,7 +45,17 @@ class ApiClient {
         if (error.response?.status === 401 && !originalRequest._retry) {
           // Token expired or invalid
           if (typeof window !== 'undefined') {
-            const refreshToken = localStorage.getItem('refreshToken')
+            // Determine which token to use based on the current route
+            const isPortalRoute = window.location.pathname.startsWith('/admin-portal') ||
+                                 window.location.pathname.startsWith('/eservice/dede/officer') ||
+                                 window.location.pathname.startsWith('/login-portal') ||
+                                 window.location.pathname.startsWith('/web-portal')
+            
+            const tokenKey = isPortalRoute ? 'portal_token' : 'token'
+            const refreshTokenKey = isPortalRoute ? 'portal_refreshToken' : 'refreshToken'
+            const userKey = isPortalRoute ? 'portal_user' : 'user'
+            
+            const refreshToken = localStorage.getItem(refreshTokenKey)
             
             if (refreshToken && !originalRequest._retry) {
               originalRequest._retry = true
@@ -49,8 +69,8 @@ class ApiClient {
                 if (response.data.success && response.data.data) {
                   const newToken = response.data.data.access_token
                   const newRefreshToken = response.data.data.refresh_token
-                  localStorage.setItem('token', newToken)
-                  localStorage.setItem('refreshToken', newRefreshToken)
+                  localStorage.setItem(tokenKey, newToken)
+                  localStorage.setItem(refreshTokenKey, newRefreshToken)
                   
                   // Retry the original request with the new token
                   originalRequest.headers.Authorization = `Bearer ${newToken}`
@@ -62,15 +82,15 @@ class ApiClient {
             }
             
             // If we can't refresh the token, clear storage and redirect
-            localStorage.removeItem('token')
-            localStorage.removeItem('refreshToken')
-            localStorage.removeItem('user')
+            localStorage.removeItem(tokenKey)
+            localStorage.removeItem(refreshTokenKey)
+            localStorage.removeItem(userKey)
             
             // Only redirect if not on authentication pages to avoid unwanted redirects
             // Don't redirect on login, home page, or register pages
-            const authPages = ['/login', '/', '/register', '/reset-password', '/invite']
+            const authPages = ['/login', '/', '/register', '/reset-password', '/invite', '/login-portal']
             if (!authPages.includes(window.location.pathname)) {
-              window.location.href = '/'
+              window.location.href = isPortalRoute ? '/login-portal' : '/'
             }
           }
         }

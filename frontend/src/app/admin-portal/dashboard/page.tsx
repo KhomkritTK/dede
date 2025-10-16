@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import { useAuth } from '@/hooks/useAuth'
+import { usePortalAuth } from '@/hooks/usePortalAuth'
 import { apiClient } from '@/lib/api'
 import ServiceFlowVisualization from '@/components/admin/ServiceFlowVisualization'
 import {
@@ -45,7 +45,7 @@ interface PerformanceStats {
 }
 
 export default function AdminDashboardPage() {
-  const { user } = useAuth()
+  const { user } = usePortalAuth()
   const [selectedTimeRange, setSelectedTimeRange] = useState('30')
 
   // Fetch dashboard statistics

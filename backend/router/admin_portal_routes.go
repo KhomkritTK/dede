@@ -15,6 +15,7 @@ func AdminPortalRoutes(r *gin.RouterGroup, db *gorm.DB, cfg *config.Config) {
 	// Create handlers
 	authHandler := authhandler.NewAuthHandler(db, cfg)
 	adminHandler := adminhandler.NewAdminHandler(db, cfg)
+	serviceFlowHandler := adminhandler.NewServiceFlowHandler(db, cfg)
 
 	// Public routes for admin portal login
 	public := r.Group("/admin-portal")
@@ -49,6 +50,15 @@ func AdminPortalRoutes(r *gin.RouterGroup, db *gorm.DB, cfg *config.Config) {
 			services.POST("/requests/:id/assign", adminHandler.AssignRequest)
 			services.POST("/requests/:id/return", adminHandler.ReturnDocumentsToUser)
 			services.POST("/requests/:id/forward", adminHandler.ForwardToDedeHead)
+		}
+
+		// Dashboard routes
+		dashboard := protected.Group("/dashboard")
+		{
+			dashboard.GET("/stats", serviceFlowHandler.GetDashboardStats)
+			dashboard.GET("/stats/summary", serviceFlowHandler.GetServiceSummaryStats)
+			dashboard.GET("/stats/timeline", serviceFlowHandler.GetTimelineStats)
+			dashboard.GET("/stats/performance", serviceFlowHandler.GetPerformanceStats)
 		}
 
 		// Admin user management

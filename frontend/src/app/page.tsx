@@ -124,10 +124,10 @@ export default function HomePage() {
       
       // If user is an officer/admin but logged in through regular login tab
       if (activeTab === 'login' && officerRoles.includes(user.role)) {
-        setTimeout(async () => {
-          await logout()
-          setError('บัญชีนี้เป็นของเจ้าหน้าที่ กรุณาใช้แท็บ "เข้าสู่ระบบเจ้าหน้าที่" เพื่อเข้าสู่ระบบ')
-        }, 500)
+        // Instead of logging out, redirect admin users to the appropriate dashboard
+        setTimeout(() => {
+          router.push('/admin-portal/dashboard')
+        }, 1000)
         return
       }
       

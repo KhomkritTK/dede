@@ -18,8 +18,11 @@ export default function WebViewPage() {
       // Redirect to appropriate page based on user role
       if (user?.role === 'user') {
         router.push('/eservice/dede/home')
+      } else if (user?.role?.includes('admin') || user?.role === 'system_admin' || user?.role === 'dede_head_admin' || user?.role === 'dede_staff_admin' || user?.role === 'dede_consult_admin' || user?.role === 'auditor_admin') {
+        // If user is an admin, redirect to admin portal dashboard
+        router.push('/admin-portal/dashboard')
       } else {
-        // If user is not a regular user, redirect to main page
+        // If user is not a regular user or admin, redirect to main page
         router.push('/?error=invalid_role')
       }
     }

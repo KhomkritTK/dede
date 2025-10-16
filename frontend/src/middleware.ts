@@ -18,5 +18,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/eservice/dede/officer/:path*', '/admin-portal/:path*']
+  matcher: ['/eservice/dede/officer/:path*', '/admin-portal/:path*', '/web-view/admin-portal/:path*']
 }
