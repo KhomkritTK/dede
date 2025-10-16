@@ -23,11 +23,17 @@ export class AuthService {
     const response = await apiClient.post<{ user: User; access_token: string; refresh_token: string }>('/api/v1/auth/login', credentials)
     
     if (response.success && response.data) {
+      // Determine storage keys based on login type
+      const loginType = credentials.login_type || 'web_view'
+      const tokenKey = loginType === 'web_portal' ? 'portal_token' : 'token'
+      const refreshTokenKey = loginType === 'web_portal' ? 'portal_refreshToken' : 'refreshToken'
+      const userKey = loginType === 'web_portal' ? 'portal_user' : 'user'
+      
       // Store token and user in localStorage
       if (typeof window !== 'undefined') {
-        localStorage.setItem('token', response.data.access_token)
-        localStorage.setItem('refreshToken', response.data.refresh_token)
-        localStorage.setItem('user', JSON.stringify(response.data.user))
+        localStorage.setItem(tokenKey, response.data.access_token)
+        localStorage.setItem(refreshTokenKey, response.data.refresh_token)
+        localStorage.setItem(userKey, JSON.stringify(response.data.user))
       }
       
       // Transform the response to match the expected format
@@ -50,15 +56,20 @@ export class AuthService {
     }
   }
 
-  async loginWithOTP(credentials: LoginWithOTPCredentials): Promise<ApiResponse<{ user: User; token: string }>> {
+  async loginWithOTP(credentials: LoginWithOTPCredentials, loginType: string = 'web_view'): Promise<ApiResponse<{ user: User; token: string }>> {
     const response = await apiClient.post<{ user: User; access_token: string; refresh_token: string }>('/api/v1/auth/login-otp', credentials)
     
     if (response.success && response.data) {
+      // Determine storage keys based on login type
+      const tokenKey = loginType === 'web_portal' ? 'portal_token' : 'token'
+      const refreshTokenKey = loginType === 'web_portal' ? 'portal_refreshToken' : 'refreshToken'
+      const userKey = loginType === 'web_portal' ? 'portal_user' : 'user'
+      
       // Store token and user in localStorage
       if (typeof window !== 'undefined') {
-        localStorage.setItem('token', response.data.access_token)
-        localStorage.setItem('refreshToken', response.data.refresh_token)
-        localStorage.setItem('user', JSON.stringify(response.data.user))
+        localStorage.setItem(tokenKey, response.data.access_token)
+        localStorage.setItem(refreshTokenKey, response.data.refresh_token)
+        localStorage.setItem(userKey, JSON.stringify(response.data.user))
       }
       
       // Transform the response to match the expected format
@@ -81,18 +92,22 @@ export class AuthService {
     }
   }
 
-  async logout(): Promise<void> {
+  async logout(loginType: string = 'web_view'): Promise<void> {
     try {
       await apiClient.post('/api/v1/auth/logout')
     } catch (error) {
       // Even if the API call fails, we should clear local storage
       console.error('Logout API call failed:', error)
     } finally {
-      // Clear token and user from localStorage
+      // Clear token and user from localStorage based on login type
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('token')
-        localStorage.removeItem('refreshToken')
-        localStorage.removeItem('user')
+        const tokenKey = loginType === 'web_portal' ? 'portal_token' : 'token'
+        const refreshTokenKey = loginType === 'web_portal' ? 'portal_refreshToken' : 'refreshToken'
+        const userKey = loginType === 'web_portal' ? 'portal_user' : 'user'
+        
+        localStorage.removeItem(tokenKey)
+        localStorage.removeItem(refreshTokenKey)
+        localStorage.removeItem(userKey)
       }
     }
   }
@@ -201,16 +216,32 @@ export class AuthService {
   }
 
   async refreshToken(): Promise<ApiResponse<{ token: string }>> {
-    const response = await apiClient.post<{ token: string }>('/api/v1/auth/refresh')
+    const response = await apiClient.post<{ access_token: string; refresh_token: string }>('/api/v1/auth/refresh-token', {
+      refresh_token: this.getRefreshToken()
+    })
     
     if (response.success && response.data) {
-      // Update token in localStorage
+      // Update tokens in localStorage
       if (typeof window !== 'undefined') {
-        localStorage.setItem('token', response.data.token)
+        localStorage.setItem('token', response.data.access_token)
+        localStorage.setItem('refreshToken', response.data.refresh_token)
+      }
+      
+      // Transform response to match expected format
+      return {
+        success: response.success,
+        message: response.message,
+        data: {
+          token: response.data.access_token
+        }
       }
     }
     
-    return response
+    // Return error response with correct type
+    return {
+      success: response.success,
+      message: response.message
+    }
   }
 
   async getProfile(): Promise<ApiResponse<User>> {
@@ -264,21 +295,30 @@ export class AuthService {
   }
 
   // Utility methods
-  isAuthenticated(): boolean {
+  isAuthenticated(loginType: string = 'web_view'): boolean {
     if (typeof window === 'undefined') return false
-    const token = localStorage.getItem('token')
+    const tokenKey = loginType === 'web_portal' ? 'portal_token' : 'token'
+    const token = localStorage.getItem(tokenKey)
     return !!token
   }
 
-  getCurrentUser(): User | null {
+  getCurrentUser(loginType: string = 'web_view'): User | null {
     if (typeof window === 'undefined') return null
-    const userStr = localStorage.getItem('user')
+    const userKey = loginType === 'web_portal' ? 'portal_user' : 'user'
+    const userStr = localStorage.getItem(userKey)
     return userStr ? JSON.parse(userStr) : null
   }
 
-  getToken(): string | null {
+  getToken(loginType: string = 'web_view'): string | null {
     if (typeof window === 'undefined') return null
-    return localStorage.getItem('token')
+    const tokenKey = loginType === 'web_portal' ? 'portal_token' : 'token'
+    return localStorage.getItem(tokenKey)
+  }
+
+  getRefreshToken(loginType: string = 'web_view'): string | null {
+    if (typeof window === 'undefined') return null
+    const refreshTokenKey = loginType === 'web_portal' ? 'portal_refreshToken' : 'refreshToken'
+    return localStorage.getItem(refreshTokenKey)
   }
 }
 

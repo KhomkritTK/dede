@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/hooks/useAuth'
+import { usePortalAuth } from '@/hooks/usePortalAuth'
 import OfficerLayout from '@/components/layout/OfficerLayout'
 
 export default function OfficerLayoutWrapper({
@@ -10,7 +10,7 @@ export default function OfficerLayoutWrapper({
 }: {
   children: React.ReactNode
 }) {
-  const { user, isAuthenticated, isLoading } = useAuth()
+  const { user, isAuthenticated, isLoading } = usePortalAuth()
   const router = useRouter()
 
   useEffect(() => {

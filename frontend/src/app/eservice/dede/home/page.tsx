@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
+import { useQuery } from '@tanstack/react-query'
+import { apiClient } from '@/lib/api'
 import PublicLayout from '@/components/layout/PublicLayout'
 import Link from 'next/link'
 import {
@@ -29,65 +31,42 @@ interface UserRequest {
 export default function UserDashboardPage() {
   const { user, isAuthenticated, isLoading } = useAuth()
   const router = useRouter()
-  const [requests, setRequests] = useState<UserRequest[]>([])
-  const [requestsLoading, setRequestsLoading] = useState(true)
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
 
+  // Redirect if not authenticated
   useEffect(() => {
-    // Redirect if not authenticated
     if (!isLoading && !isAuthenticated) {
       router.push('/')
       return
     }
   }, [isAuthenticated, isLoading, router])
 
+  // Redirect admin users to admin portal
   useEffect(() => {
-    // Fetch user requests
-    if (isAuthenticated) {
-      // Simulate API call to fetch user requests (reduced timeout for faster UX)
-      setTimeout(() => {
-        setRequests([
-          {
-            id: '1',
-            requestNumber: 'REQ-2023-001',
-            type: 'new_license',
-            title: 'คำขอใบอนุญาตผลิตไฟฟ้าจากพลังงานแสงอาทิตย์',
-            status: 'accepted',
-            submittedDate: '2023-10-01',
-            lastUpdated: '2023-10-05'
-          },
-          {
-            id: '2',
-            requestNumber: 'REQ-2023-002',
-            type: 'renewal',
-            title: 'คำขอต่ออายุใบอนุญาตผลิตไฟฟ้าจากพลังงานลม',
-            status: 'assigned',
-            submittedDate: '2023-09-15',
-            lastUpdated: '2023-09-20'
-          },
-          {
-            id: '3',
-            requestNumber: 'REQ-2023-003',
-            type: 'extension',
-            title: 'คำขอขยายการผลิตพลังงานชีวมวล',
-            status: 'inspecting',
-            submittedDate: '2023-09-10',
-            lastUpdated: '2023-09-25'
-          },
-          {
-            id: '4',
-            requestNumber: 'REQ-2023-004',
-            type: 'reduction',
-            title: 'คำขอลดการผลิตพลังงานน้ำ',
-            status: 'document_edit',
-            submittedDate: '2023-08-28',
-            lastUpdated: '2023-09-05'
-          }
-        ])
-        setRequestsLoading(false)
-      }, 500) // Reduced from 1000ms to 500ms for faster loading
+    if (!isLoading && isAuthenticated && user) {
+      const adminRoles = [
+        'admin', 'system_admin', 'dede_head_admin', 'dede_staff_admin', 'dede_consult_admin', 'auditor_admin',
+        'dede_head', 'dede_staff', 'dede_consult', 'auditor'
+      ]
+      
+      if (adminRoles.includes(user.role)) {
+        router.push('/admin-portal/dashboard')
+        return
+      }
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated, isLoading, router, user])
+
+  // Fetch user requests
+  const { data: requests, isLoading: requestsLoading, refetch } = useQuery({
+    queryKey: ['user-requests'],
+    queryFn: async () => {
+      const response = await apiClient.get<UserRequest[]>('/api/v1/user/requests')
+      return response.data
+    },
+    enabled: isAuthenticated,
+    // Refetch when window gains focus (when user switches back from admin portal)
+    refetchOnWindowFocus: true,
+  })
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -285,7 +264,7 @@ export default function UserDashboardPage() {
                 <div className="animate-spin rounded-full h-14 w-14 border-b-4 border-blue-600 mx-auto"></div>
                 <p className="mt-4 text-gray-600 font-medium font-sans">กำลังโหลดข้อมูล...</p>
               </div>
-            ) : requests.length > 0 ? (
+            ) : requests && requests.length > 0 ? (
               <ul className="divide-y divide-gray-100">
                 {requests.map((request) => (
                   <li key={request.id} className="transform transition-all duration-200 hover:bg-gray-50 hover:scale-[1.01]">
@@ -347,7 +326,7 @@ export default function UserDashboardPage() {
               </div>
             )}
           </div>
-          {requests.length > 0 && (
+          {requests && requests.length > 0 && (
             <div className="px-6 py-4 sm:px-6 bg-gray-50 text-right">
               <Link
                 href="/eservice/dede/requests"

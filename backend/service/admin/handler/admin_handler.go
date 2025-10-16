@@ -424,6 +424,41 @@ func (h *AdminHandler) createNotificationForRole(role models.UserRole, title, me
 	h.db.Create(notification)
 }
 
+// GetAdminUsers handles getting all admin users
+func (h *AdminHandler) GetAdminUsers(c *gin.Context) {
+	var adminUsers []models.AdminUser
+
+	// Preload the User relationship
+	if err := h.db.Preload("User").Find(&adminUsers).Error; err != nil {
+		utils.ErrorInternalServerError(c, "Failed to retrieve admin users", err)
+		return
+	}
+
+	// Transform the data to match the expected format
+	var result []map[string]interface{}
+	for _, adminUser := range adminUsers {
+		result = append(result, map[string]interface{}{
+			"id":          adminUser.ID,
+			"user_id":     adminUser.UserID,
+			"admin_role":  adminUser.AdminRole,
+			"department":  adminUser.Department,
+			"permissions": adminUser.Permissions,
+			"created_at":  adminUser.CreatedAt,
+			"updated_at":  adminUser.UpdatedAt,
+			"user": map[string]interface{}{
+				"id":        adminUser.User.ID,
+				"username":  adminUser.User.Username,
+				"email":     adminUser.User.Email,
+				"full_name": adminUser.User.FullName,
+				"role":      adminUser.User.Role,
+				"status":    adminUser.User.Status,
+			},
+		})
+	}
+
+	utils.SuccessOK(c, "Admin users retrieved successfully", gin.H{"users": result})
+}
+
 // matchesFilters checks if a request matches the provided filters
 func (h *AdminHandler) matchesFilters(req interface{}, search, status, licenseType string) bool {
 	// This is a simplified implementation

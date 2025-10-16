@@ -22,6 +22,7 @@ export interface AuthState {
 export interface LoginCredentials {
   username: string
   password: string
+  login_type?: string // "web_view" or "web_portal"
 }
 
 export interface LoginWithOTPCredentials {

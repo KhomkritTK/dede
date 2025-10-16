@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import { useAuth } from '@/hooks/useAuth'
+import { usePortalAuth } from '@/hooks/usePortalAuth'
 import LoginWithOTP from '@/components/auth/LoginWithOTP'
 import PasswordReset from '@/components/auth/PasswordReset'
 
@@ -20,7 +20,7 @@ const loginSchema = yup.object().shape({
 })
 
 export default function OfficerLoginPage() {
-  const { login, isAuthenticated, isLoading, user } = useAuth()
+  const { login, isAuthenticated, isLoading, user } = usePortalAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   const [error, setError] = useState<string | null>(null)

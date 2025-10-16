@@ -15,7 +15,7 @@ func AdminRoutes(r *gin.RouterGroup, db *gorm.DB, cfg *config.Config) {
 	auth := r.Group("/auth")
 	{
 		auth.POST("/logout", authHandler.Logout)
-		auth.POST("/refresh", authHandler.RefreshToken)
+		auth.POST("/refresh-token", authHandler.RefreshToken)
 	}
 }
 

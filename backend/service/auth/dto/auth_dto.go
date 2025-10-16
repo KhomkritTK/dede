@@ -2,8 +2,9 @@ package dto
 
 // LoginRequest represents the login request payload
 type LoginRequest struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Username  string `json:"username" binding:"required"`
+	Password  string `json:"password" binding:"required"`
+	LoginType string `json:"login_type"` // "web_view" or "web_portal"
 }
 
 // LoginResponse represents the login response payload

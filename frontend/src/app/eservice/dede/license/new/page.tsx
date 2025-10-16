@@ -87,6 +87,21 @@ export default function NewLicensePage() {
     }
   }, [isAuthenticated, isLoading, router])
 
+  // Redirect admin users to admin portal
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && user) {
+      const adminRoles = [
+        'admin', 'system_admin', 'dede_head_admin', 'dede_staff_admin', 'dede_consult_admin', 'auditor_admin',
+        'dede_head', 'dede_staff', 'dede_consult', 'auditor'
+      ]
+      
+      if (adminRoles.includes(user.role)) {
+        router.push('/admin-portal/dashboard')
+        return
+      }
+    }
+  }, [isAuthenticated, isLoading, router, user])
+
   const onSubmit = async (data: NewLicenseFormData) => {
     setIsSubmitting(true)
     setError(null)

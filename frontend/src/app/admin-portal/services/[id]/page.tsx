@@ -85,6 +85,8 @@ export default function AdminServiceDetailPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-license-request', id] })
+      // Invalidate user requests queries to update the web view
+      queryClient.invalidateQueries({ queryKey: ['user-requests'] })
       alert('สถานะคำขอถูกอัปเดตเรียบร้อย')
     },
     onError: (error) => {
@@ -101,6 +103,8 @@ export default function AdminServiceDetailPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-license-request', id] })
+      // Invalidate user requests queries to update the web view
+      queryClient.invalidateQueries({ queryKey: ['user-requests'] })
       setShowAssignModal(false)
       setAssignRole('')
       setAssignReason('')
@@ -120,6 +124,8 @@ export default function AdminServiceDetailPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-license-request', id] })
+      // Invalidate user requests queries to update the web view
+      queryClient.invalidateQueries({ queryKey: ['user-requests'] })
       setShowReturnModal(false)
       setReturnReason('')
       alert('เอกสารถูกส่งกลับไปยังผู้ใช้เรียบร้อย')
@@ -138,6 +144,8 @@ export default function AdminServiceDetailPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-license-request', id] })
+      // Invalidate user requests queries to update the web view
+      queryClient.invalidateQueries({ queryKey: ['user-requests'] })
       setShowForwardModal(false)
       setForwardReason('')
       alert('คำขอถูกส่งต่อให้ DEDE Head เรียบร้อย')

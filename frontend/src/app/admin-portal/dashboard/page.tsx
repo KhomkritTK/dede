@@ -199,17 +199,55 @@ export default function AdminDashboardPage() {
     }
   }
 
+  const getRoleDisplayName = (role: string) => {
+    switch (role) {
+      case 'system_admin':
+        return 'ผู้ดูแลระบบ'
+      case 'dede_head_admin':
+        return 'ผู้บริหาร DEDE'
+      case 'dede_staff_admin':
+        return 'เจ้าหน้าที่ DEDE'
+      case 'dede_consult_admin':
+        return 'ที่ปรึกษา DEDE'
+      case 'auditor_admin':
+        return 'ผู้ตรวจสอบ'
+      case 'admin':
+        return 'ผู้ดูแลระบบ'
+      default:
+        return role
+    }
+  }
+
   return (
     <div className="py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Welcome message */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">
-            แดชบอร์ดผู้ดูแลระบบ
-          </h1>
-          <p className="mt-1 text-sm text-gray-600">
-            ยินดีต้อนรับ, {user?.fullName} | ตำแหน่ง: {user?.role}
-          </p>
+        <div className="mb-8 bg-white rounded-lg shadow p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
+                <span className="text-red-600 font-bold text-lg">
+                  {user?.fullName?.charAt(0).toUpperCase() || 'A'}
+                </span>
+              </div>
+            </div>
+            <div className="ml-4">
+              <h1 className="text-2xl font-bold text-gray-900">
+                แดชบอร์ดผู้ดูแลระบบ
+              </h1>
+              <p className="mt-1 text-sm text-gray-600">
+                ยินดีต้อนรับ, <span className="font-semibold text-gray-900">{user?.fullName}</span>
+              </p>
+              <p className="text-sm text-gray-500">
+                ตำแหน่ง: <span className="font-medium">{getRoleDisplayName(user?.role || '')}</span>
+                {user?.email && (
+                  <span className="ml-3">
+                    อีเมล: <span className="font-medium">{user?.email}</span>
+                  </span>
+                )}
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Stats cards */}
@@ -395,6 +433,26 @@ export default function AdminDashboardPage() {
                       className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-blue-800 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
                       จัดการ
+                    </Link>
+                  </div>
+                </div>
+
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <div className="flex items-center">
+                    <DocumentTextIcon className="h-6 w-6 text-green-600 mr-3" />
+                    <div className="flex-1">
+                      <h4 className="text-sm font-medium text-green-800">
+                        จัดการคำขอทั้งหมด
+                      </h4>
+                      <p className="text-sm text-green-700 mt-1">
+                        ดูและจัดการคำขอทั้งหมดในระบบ
+                      </p>
+                    </div>
+                    <Link
+                      href="/admin-portal/services"
+                      className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-green-800 bg-green-100 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    >
+                      จัดการคำขอ
                     </Link>
                   </div>
                 </div>

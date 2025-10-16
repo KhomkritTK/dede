@@ -54,16 +54,19 @@ export default function LoginPage() {
   useEffect(() => {
     // Only redirect if not loading and authenticated
     if (!isLoading && isAuthenticated) {
-      // Redirect based on user role
-      if (user?.role === 'admin' ||
-          user?.role === 'dede_head' ||
-          user?.role === 'dede_staff' ||
-          user?.role === 'dede_consult' ||
-          user?.role === 'auditor') {
-        router.push('/eservice/dede/officer/dashboard')
-      } else {
-        router.push('/eservice/dede/home')
+      // Redirect admin users to admin portal
+      const adminRoles = [
+        'admin', 'system_admin', 'dede_head_admin', 'dede_staff_admin', 'dede_consult_admin', 'auditor_admin',
+        'dede_head', 'dede_staff', 'dede_consult', 'auditor'
+      ]
+      
+      if (user && adminRoles.includes(user.role)) {
+        router.push('/admin-portal/dashboard')
+        return
       }
+      
+      // Regular users go to home page
+      router.push('/eservice/dede/home')
     }
   }, [isAuthenticated, isLoading, router, user])
 

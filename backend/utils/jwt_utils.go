@@ -9,18 +9,20 @@ import (
 
 // JWTClaims represents the claims in a JWT token
 type JWTClaims struct {
-	UserID uint   `json:"user_id"`
-	Email  string `json:"email"`
-	Role   string `json:"role"`
+	UserID    uint   `json:"user_id"`
+	Email     string `json:"email"`
+	Role      string `json:"role"`
+	LoginType string `json:"login_type"` // "web_view" or "web_portal"
 	jwt.RegisteredClaims
 }
 
 // GenerateJWT generates a new JWT token
-func GenerateJWT(userID uint, email, role, secretKey string, expiry time.Duration) (string, error) {
+func GenerateJWT(userID uint, email, role, secretKey string, expiry time.Duration, loginType string) (string, error) {
 	claims := JWTClaims{
-		UserID: userID,
-		Email:  email,
-		Role:   role,
+		UserID:    userID,
+		Email:     email,
+		Role:      role,
+		LoginType: loginType,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expiry)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -75,7 +77,7 @@ func RefreshJWT(tokenString, secretKey string, expiry time.Duration) (string, er
 	}
 
 	// Generate new token with same claims but new expiry
-	return GenerateJWT(claims.UserID, claims.Email, claims.Role, secretKey, expiry)
+	return GenerateJWT(claims.UserID, claims.Email, claims.Role, secretKey, expiry, claims.LoginType)
 }
 
 // ExtractTokenFromHeader extracts JWT token from Authorization header
@@ -99,15 +101,15 @@ func ExtractTokenFromHeader(authHeader string) (string, error) {
 }
 
 // GenerateTokenPair generates access and refresh tokens
-func GenerateTokenPair(userID uint, email, role, secretKey string) (accessToken, refreshToken string, err error) {
+func GenerateTokenPair(userID uint, email, role, secretKey string, loginType string) (accessToken, refreshToken string, err error) {
 	// Generate access token (short-lived)
-	accessToken, err = GenerateJWT(userID, email, role, secretKey, time.Hour*24)
+	accessToken, err = GenerateJWT(userID, email, role, secretKey, time.Hour*24, loginType)
 	if err != nil {
 		return "", "", err
 	}
 
 	// Generate refresh token (long-lived)
-	refreshToken, err = GenerateJWT(userID, email, role, secretKey, time.Hour*24*30) // 30 days
+	refreshToken, err = GenerateJWT(userID, email, role, secretKey, time.Hour*24*30, loginType) // 30 days
 	if err != nil {
 		return "", "", err
 	}

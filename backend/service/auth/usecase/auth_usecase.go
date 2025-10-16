@@ -26,6 +26,12 @@ func NewAuthUsecase(userRepo repository.UserRepository, config *config.Config) A
 }
 
 func (u *authUsecase) Login(req dto.LoginRequest) (*dto.LoginResponse, error) {
+	// Set default login type if not provided
+	loginType := req.LoginType
+	if loginType == "" {
+		loginType = "web_view" // Default to web view
+	}
+
 	// Find user by username
 	user, err := u.userRepo.GetByUsername(req.Username)
 	if err != nil {
@@ -48,6 +54,7 @@ func (u *authUsecase) Login(req dto.LoginRequest) (*dto.LoginResponse, error) {
 		user.Email,
 		string(user.Role),
 		u.config.JWTSecret,
+		loginType,
 	)
 	if err != nil {
 		return nil, errors.New("failed to generate tokens")
@@ -176,12 +183,13 @@ func (u *authUsecase) RefreshToken(req dto.RefreshTokenRequest) (*dto.LoginRespo
 		return nil, errors.New("user account is not active")
 	}
 
-	// Generate new tokens
+	// Generate new tokens with the same login type
 	accessToken, refreshToken, err := utils.GenerateTokenPair(
 		user.ID,
 		user.Email,
 		string(user.Role),
 		u.config.JWTSecret,
+		claims.LoginType,
 	)
 	if err != nil {
 		return nil, errors.New("failed to generate tokens")

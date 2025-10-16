@@ -75,6 +75,7 @@ export default function LoginPage() {
     if (!result.success) {
       setError(result.message || 'Login failed')
     }
+    // If login is successful, the useEffect will handle the redirect
   }
 
   const handleLoginWithOTPSuccess = () => {

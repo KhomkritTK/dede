@@ -42,13 +42,15 @@ class ApiClient {
               
               try {
                 // Try to refresh the token
-                const response = await axios.post(`${this.client.defaults.baseURL}/api/v1/auth/refresh`, {
+                const response = await axios.post(`${this.client.defaults.baseURL}/api/v1/auth/refresh-token`, {
                   refresh_token: refreshToken
                 })
                 
                 if (response.data.success && response.data.data) {
                   const newToken = response.data.data.access_token
+                  const newRefreshToken = response.data.data.refresh_token
                   localStorage.setItem('token', newToken)
+                  localStorage.setItem('refreshToken', newRefreshToken)
                   
                   // Retry the original request with the new token
                   originalRequest.headers.Authorization = `Bearer ${newToken}`
@@ -64,9 +66,11 @@ class ApiClient {
             localStorage.removeItem('refreshToken')
             localStorage.removeItem('user')
             
-            // Only redirect if not already on login page to avoid circular redirects
-            if (window.location.pathname !== '/login') {
-              window.location.href = '/login'
+            // Only redirect if not on authentication pages to avoid unwanted redirects
+            // Don't redirect on login, home page, or register pages
+            const authPages = ['/login', '/', '/register', '/reset-password', '/invite']
+            if (!authPages.includes(window.location.pathname)) {
+              window.location.href = '/'
             }
           }
         }

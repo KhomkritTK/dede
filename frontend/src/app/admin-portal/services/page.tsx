@@ -1,7 +1,8 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { apiClient } from '@/lib/api'
 import {
   DocumentTextIcon,
@@ -51,6 +52,23 @@ export default function AdminServicesPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
+  
+  // Get query parameters from URL
+  const searchParams = useSearchParams()
+  
+  // Set initial filters from URL parameters
+  useEffect(() => {
+    const status = searchParams.get('status')
+    if (status) {
+      if (status === 'pending') {
+        setStatusFilter('new_request')
+      } else if (status === 'in_progress') {
+        setStatusFilter('assigned')
+      } else {
+        setStatusFilter(status)
+      }
+    }
+  }, [searchParams])
 
   // Fetch license requests from all four tables
   const { data: licenseRequests, isLoading } = useQuery({

@@ -50,5 +50,11 @@ func AdminPortalRoutes(r *gin.RouterGroup, db *gorm.DB, cfg *config.Config) {
 			services.POST("/requests/:id/return", adminHandler.ReturnDocumentsToUser)
 			services.POST("/requests/:id/forward", adminHandler.ForwardToDedeHead)
 		}
+
+		// Admin user management
+		admin := protected.Group("/admin")
+		{
+			admin.GET("/users", adminHandler.GetAdminUsers)
+		}
 	}
 }

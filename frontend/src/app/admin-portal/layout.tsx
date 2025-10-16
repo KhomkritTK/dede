@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuth } from '@/hooks/useAuth'
+import { usePortalAuth } from '@/hooks/usePortalAuth'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import AdminLayout from '@/components/layout/AdminLayout'
@@ -10,13 +10,13 @@ export default function AdminPortalLayout({
 }: {
   children: React.ReactNode
 }) {
-  const { isAuthenticated, user, isLoading } = useAuth()
+  const { isAuthenticated, user, isLoading } = usePortalAuth()
   const router = useRouter()
 
   useEffect(() => {
     if (!isLoading) {
       if (!isAuthenticated) {
-        router.push('/login-portal')
+        router.push('/')
         return
       }
 

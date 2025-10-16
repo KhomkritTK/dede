@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Test</title>
+</head>
+<body>
+    <h1>Login Test</h1>
+    <form id="loginForm">
+        <div>
+            <label>Username:</label>
+            <input type="text" id="username" value="admin">
+        </div>
+        <div>
+            <label>Password:</label>
+            <input type="password" id="password" value="admin123">
+        </div>
+        <button type="submit">Login</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                resultDiv.innerHTML = 'Logging in...';
+                
+                const response = await fetch('http://localhost:8080/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password }),
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    resultDiv.innerHTML = `
+                        <h3>Login Successful!</h3>
+                        <p><strong>User:</strong> ${JSON.stringify(data.data.user, null, 2)}</p>
+                        <p><strong>Token:</strong> ${data.data.access_token.substring(0, 50)}...</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<h3>Login Failed:</h3><p>${data.message || 'Unknown error'}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<h3>Error:</h3><p>${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

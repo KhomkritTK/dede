@@ -31,6 +31,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const handleLogout = async () => {
     await logout()
     router.push('/')
+    // Force a page refresh to ensure the main page loads with fresh state
+    window.location.href = '/'
   }
 
   const navigation = [
@@ -90,6 +92,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         return 'ที่ปรึกษา DEDE'
       case 'auditor_admin':
         return 'ผู้ตรวจสอบ'
+      case 'admin':
+        return 'ผู้ดูแลระบบ'
       default:
         return role
     }
@@ -145,18 +149,23 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </nav>
           </div>
           <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
-            <div className="flex items-center">
+            <div className="flex items-center w-full">
               <div className="flex-shrink-0">
-                <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
-                  <UserIcon className="h-5 w-5 text-gray-500" />
+                <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
+                  <span className="text-red-600 font-bold text-lg">
+                    {user?.fullName?.charAt(0).toUpperCase() || 'A'}
+                  </span>
                 </div>
               </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-700">{user?.fullName}</p>
+              <div className="ml-3 flex-1">
+                <p className="text-sm font-medium text-gray-900">{user?.fullName}</p>
                 <p className="text-xs font-medium text-gray-500">{getRoleDisplayName(user?.role || '')}</p>
+                {user?.email && (
+                  <p className="text-xs text-gray-400 truncate">{user?.email}</p>
+                )}
               </div>
             </div>
-            <div className="mt-3">
+            <div className="mt-3 w-full">
               <button
                 onClick={handleLogout}
                 className="group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -201,18 +210,23 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </nav>
         </div>
         <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
-          <div className="flex items-center">
+          <div className="flex items-center w-full">
             <div className="flex-shrink-0">
-              <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
-                <UserIcon className="h-5 w-5 text-gray-500" />
+              <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
+                <span className="text-red-600 font-bold text-lg">
+                  {user?.fullName?.charAt(0).toUpperCase() || 'A'}
+                </span>
               </div>
             </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium text-gray-700">{user?.fullName}</p>
+            <div className="ml-3 flex-1">
+              <p className="text-sm font-medium text-gray-900">{user?.fullName}</p>
               <p className="text-xs font-medium text-gray-500">{getRoleDisplayName(user?.role || '')}</p>
+              {user?.email && (
+                <p className="text-xs text-gray-400 truncate">{user?.email}</p>
+              )}
             </div>
           </div>
-          <div className="mt-3">
+          <div className="mt-3 w-full">
             <button
               onClick={handleLogout}
               className="group flex w-full items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900"
