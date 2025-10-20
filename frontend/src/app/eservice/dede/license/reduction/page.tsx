@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { useAuth } from '@/hooks/useAuth'
+import { usePortalAuth } from '@/hooks/usePortalAuth'
 import PublicLayout from '@/components/layout/PublicLayout'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
@@ -44,6 +45,7 @@ interface ReductionFormData {
 
 export default function ProductionReductionPage() {
   const { user, isAuthenticated, isLoading } = useAuth()
+  const { user: portalUser, isAuthenticated: isPortalAuth, isLoading: isPortalLoading } = usePortalAuth()
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
@@ -68,18 +70,21 @@ export default function ProductionReductionPage() {
       expectedStartDate: '',
       contactPerson: '',
       contactPhone: '',
-      contactEmail: user?.email || '',
+      contactEmail: (user || portalUser)?.email || '',
       description: '',
     },
   })
 
   useEffect(() => {
-    // Redirect if not authenticated
-    if (!isLoading && !isAuthenticated) {
-      router.push('/login')
+    // Redirect if not authenticated (check both auth systems)
+    const isLoaded = !isLoading && !isPortalLoading
+    const hasAuth = isAuthenticated || isPortalAuth
+    
+    if (isLoaded && !hasAuth) {
+      router.push('/?redirect=eservice/dede/license/reduction')
       return
     }
-  }, [isAuthenticated, isLoading, router])
+  }, [isAuthenticated, isPortalAuth, isLoading, isPortalLoading, router])
 
   const onSubmit = async (data: ReductionFormData) => {
     setIsSubmitting(true)
@@ -118,7 +123,7 @@ export default function ProductionReductionPage() {
     }
   }
 
-  if (isLoading || !isAuthenticated) {
+  if ((isLoading || !isAuthenticated) && (isPortalLoading || !isPortalAuth)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>

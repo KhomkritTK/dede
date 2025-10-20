@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
+import { usePortalAuth } from '@/hooks/usePortalAuth'
+import { useQuery } from '@tanstack/react-query'
+import { apiClient } from '@/lib/api'
 import PublicLayout from '@/components/layout/PublicLayout'
 import Link from 'next/link'
 import {
@@ -63,119 +66,52 @@ interface RequestDetail {
 
 export default function RequestDetailPage() {
   const { user, isAuthenticated, isLoading } = useAuth()
+  const { user: portalUser, isAuthenticated: isPortalAuth, isLoading: isPortalLoading } = usePortalAuth()
   const params = useParams()
   const router = useRouter()
-  const [request, setRequest] = useState<RequestDetail | null>(null)
-  const [loading, setLoading] = useState(true)
+  
+  // Get the current authenticated user from either auth system
+  const currentUser = portalUser || user
+  const isUserAuthenticated = isAuthenticated || isPortalAuth
 
+  // Fetch request details
+  const { data: request, isLoading: requestLoading } = useQuery({
+    queryKey: ['request-detail', params.id],
+    queryFn: async () => {
+      const response = await apiClient.get<RequestDetail>(`/api/v1/admin-portal/services/requests/${params.id}`)
+      return response.data
+    },
+    enabled: isUserAuthenticated && !!params.id,
+  })
+
+  // Redirect if not authenticated
   useEffect(() => {
-    // Redirect if not authenticated
-    if (!isLoading && !isAuthenticated) {
-      router.push('/login')
+    const isLoaded = !isLoading && !isPortalLoading
+    const hasAuth = isAuthenticated || isPortalAuth
+    
+    if (isLoaded && !hasAuth) {
+      router.push('/?redirect=eservice/dede/requests/' + params.id)
       return
     }
-  }, [isAuthenticated, isLoading, router])
+  }, [isAuthenticated, isPortalAuth, isLoading, isPortalLoading, router, params.id])
 
   // Redirect admin users to admin portal
   useEffect(() => {
-    if (!isLoading && isAuthenticated && user) {
+    const isLoaded = !isLoading && !isPortalLoading
+    const hasAuth = isAuthenticated || isPortalAuth
+    
+    if (isLoaded && hasAuth && currentUser) {
       const adminRoles = [
         'admin', 'system_admin', 'dede_head_admin', 'dede_staff_admin', 'dede_consult_admin', 'auditor_admin',
         'dede_head', 'dede_staff', 'dede_consult', 'auditor'
       ]
       
-      if (adminRoles.includes(user.role)) {
+      if (adminRoles.includes(currentUser.role)) {
         router.push('/admin-portal/dashboard')
         return
       }
     }
-  }, [isAuthenticated, isLoading, router, user])
-
-  useEffect(() => {
-    // Fetch request details
-    if (isAuthenticated && params.id) {
-      // Simulate API call to fetch request details
-      setTimeout(() => {
-        setRequest({
-          id: params.id as string,
-          requestNumber: 'REQ-2023-001',
-          type: 'new_license',
-          title: 'คำขอใบอนุญาตผลิตไฟฟ้าจากพลังงานแสงอาทิตย์',
-          description: 'โครงการผลิตไฟฟ้าจากพลังงานแสงอาทิตย์ ขนาด 5 เมกะวัตต์ ตั้งอยู่ที่จังหวัดเชียงใหม่',
-          status: 'assigned',
-          submittedDate: '2023-10-01',
-          lastUpdated: '2023-10-15',
-          projectAddress: '123 หมู่ 5 ตำบลสันทราย',
-          province: 'เชียงใหม่',
-          district: 'สันทราย',
-          subdistrict: 'สันทรายเหนือ',
-          postalCode: '50220',
-          energyType: 'พลังงานแสงอาทิตย์',
-          capacity: 5,
-          capacityUnit: 'เมกะวัตต์',
-          expectedStartDate: '2024-01-15',
-          contactPerson: 'สมชาย ใจดี',
-          contactPhone: '081-234-5678',
-          contactEmail: 'somchai@example.com',
-          statusHistory: [
-            {
-              date: '2023-10-01',
-              status: 'new_request',
-              description: 'ยื่นคำขอใบอนุญาตผลิตไฟฟ้าจากพลังงานแสงอาทิตย์',
-              officer: 'ระบบ'
-            },
-            {
-              date: '2023-10-05',
-              status: 'accepted',
-              description: 'รับคำขอเข้าระบบและตรวจสอบเอกสารเบื้องต้น',
-              officer: 'เจ้าหน้าที่รับคำขอ'
-            },
-            {
-              date: '2023-10-10',
-              status: 'assigned',
-              description: 'มอบหมายให้ผู้ตรวจสอบดำเนินการตรวจสอบโครงการ',
-              officer: 'ผู้จัดการฝ่ายตรวจสอบ'
-            }
-          ],
-          documents: [
-            {
-              id: '1',
-              name: 'ใบสมัครขอรับใบอนุญาต',
-              type: 'PDF',
-              uploadDate: '2023-10-01',
-              size: '2.5 MB',
-              status: 'approved'
-            },
-            {
-              id: '2',
-              name: 'แบบแปลนโครงการ',
-              type: 'DWG',
-              uploadDate: '2023-10-01',
-              size: '15.3 MB',
-              status: 'approved'
-            },
-            {
-              id: '3',
-              name: 'รายงานการวิเคราะห์ผลกระทบสิ่งแวดล้อม',
-              type: 'PDF',
-              uploadDate: '2023-10-02',
-              size: '8.7 MB',
-              status: 'needs_revision'
-            },
-            {
-              id: '4',
-              name: 'หลักฐานการถือครองที่ดิน',
-              type: 'PDF',
-              uploadDate: '2023-10-01',
-              size: '1.2 MB',
-              status: 'pending'
-            }
-          ]
-        })
-        setLoading(false)
-      }, 500)
-    }
-  }, [isAuthenticated, params.id])
+  }, [isAuthenticated, isPortalAuth, isLoading, isPortalLoading, router, currentUser])
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -212,15 +148,15 @@ export default function RequestDetailPage() {
   const getStatusText = (status: string) => {
     switch (status) {
       case 'new_request':
-        return 'คำร้องใหม่'
+        return 'เอกสารถูกส่งให้ DEDE Admin'
       case 'accepted':
-        return 'รับคำขอ'
+        return 'DEDE Admin รับคำขอแล้ว'
       case 'assigned':
-        return 'มอบหมายผู้ตรวจ'
+        return 'มอบหมายให้เจ้าหน้าที่ตรวจสอบ'
       case 'appointment':
-        return 'นัดหมาย'
+        return 'นัดหมายวันเข้าตรวจสอบ'
       case 'inspecting':
-        return 'เข้าตรวจสอบระบบ'
+        return 'กำลังดำเนินการตรวจสอบ'
       case 'inspection_done':
         return 'ตรวจสอบเสร็จสิ้น'
       case 'document_edit':
@@ -228,13 +164,13 @@ export default function RequestDetailPage() {
       case 'report_approved':
         return 'รับรองรายงาน'
       case 'approved':
-        return 'อนุมัติใบอนุญาต'
+        return 'อนุมัติใบอนุญาตแล้ว'
       case 'rejected':
         return 'ปฏิเสธคำขอ'
       case 'rejected_final':
         return 'ปฏิเสธสุดท้าย'
       case 'returned':
-        return 'ตีเอกสารกลับไปแก้ไข'
+        return 'เอกสารถูกตีกลับเพื่อแก้ไข'
       case 'forwarded':
         return 'ส่งต่อให้ DEDE Head'
       default:
@@ -317,7 +253,7 @@ export default function RequestDetailPage() {
     }
   }
 
-  if (isLoading || !isAuthenticated) {
+  if ((isLoading || !isAuthenticated) && (isPortalLoading || !isPortalAuth)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50">
         <div className="text-center">
@@ -328,7 +264,7 @@ export default function RequestDetailPage() {
     )
   }
 
-  if (loading) {
+  if (requestLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50">
         <div className="text-center">

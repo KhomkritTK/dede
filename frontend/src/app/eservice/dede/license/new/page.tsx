@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { useAuth } from '@/hooks/useAuth'
+import { usePortalAuth } from '@/hooks/usePortalAuth'
 import PublicLayout from '@/components/layout/PublicLayout'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
@@ -48,6 +49,7 @@ interface NewLicenseFormData {
 
 export default function NewLicensePage() {
   const { user, isAuthenticated, isLoading } = useAuth()
+  const { user: portalUser, isAuthenticated: isPortalAuth, isLoading: isPortalLoading } = usePortalAuth()
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
@@ -74,33 +76,40 @@ export default function NewLicensePage() {
       expectedStartDate: '',
       contactPerson: '',
       contactPhone: '',
-      contactEmail: user?.email || '',
+      contactEmail: (user || portalUser)?.email || '',
       description: '',
     },
   })
 
   useEffect(() => {
-    // Redirect if not authenticated
-    if (!isLoading && !isAuthenticated) {
-      router.push('/login')
+    // Redirect if not authenticated (check both auth systems)
+    const isLoaded = !isLoading && !isPortalLoading
+    const hasAuth = isAuthenticated || isPortalAuth
+    
+    if (isLoaded && !hasAuth) {
+      router.push('/?redirect=eservice/dede/license/new')
       return
     }
-  }, [isAuthenticated, isLoading, router])
+  }, [isAuthenticated, isPortalAuth, isLoading, isPortalLoading, router])
 
   // Redirect admin users to admin portal
   useEffect(() => {
-    if (!isLoading && isAuthenticated && user) {
+    const isLoaded = !isLoading && !isPortalLoading
+    const currentUser = portalUser || user
+    const hasAuth = isAuthenticated || isPortalAuth
+    
+    if (isLoaded && hasAuth && currentUser) {
       const adminRoles = [
         'admin', 'system_admin', 'dede_head_admin', 'dede_staff_admin', 'dede_consult_admin', 'auditor_admin',
         'dede_head', 'dede_staff', 'dede_consult', 'auditor'
       ]
       
-      if (adminRoles.includes(user.role)) {
+      if (adminRoles.includes(currentUser.role)) {
         router.push('/admin-portal/dashboard')
         return
       }
     }
-  }, [isAuthenticated, isLoading, router, user])
+  }, [isAuthenticated, isPortalAuth, isLoading, isPortalLoading, router, user, portalUser])
 
   const onSubmit = async (data: NewLicenseFormData) => {
     setIsSubmitting(true)
@@ -141,7 +150,7 @@ export default function NewLicensePage() {
     }
   }
 
-  if (isLoading || !isAuthenticated) {
+  if ((isLoading || !isAuthenticated) && (isPortalLoading || !isPortalAuth)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>

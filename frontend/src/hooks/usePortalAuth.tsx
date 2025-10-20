@@ -29,6 +29,7 @@ export interface PortalAuthContextType extends AuthState {
   acceptInvitation: (data: AcceptInvitationData) => Promise<{ success: boolean; message?: string }>
   registerCorporateMember: (data: RegisterCorporateMemberData) => Promise<{ success: boolean; message?: string }>
   refreshProfile: () => Promise<void>
+  updateProfile: (data: any) => Promise<{ success: boolean; message?: string }>
   changePassword: (data: ChangePasswordData) => Promise<{ success: boolean; message?: string }>
   forgotPassword: (data: ForgotPasswordData) => Promise<{ success: boolean; message?: string }>
   resetPassword: (data: ResetPasswordData) => Promise<{ success: boolean; message?: string }>
@@ -380,6 +381,42 @@ export function PortalAuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const updateProfile = async (data: any) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/v1/admin-portal/auth/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem(PORTAL_TOKEN_KEY)}`
+        },
+        body: JSON.stringify(data)
+      })
+      
+      const result = await response.json()
+      
+      if (result.success) {
+        // Update portal-specific user data
+        if (typeof window !== 'undefined' && result.data) {
+          localStorage.setItem(PORTAL_USER_KEY, JSON.stringify(result.data))
+        }
+        
+        setAuthState(prev => ({
+          ...prev,
+          user: result.data || prev.user,
+        }))
+        
+        return { success: true, message: result.message || 'Profile updated successfully' }
+      } else {
+        return { success: false, message: result.message || 'Failed to update profile' }
+      }
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.response?.data?.message || error.message || 'Failed to update profile'
+      }
+    }
+  }
+
   const changePassword = async (data: ChangePasswordData) => {
     try {
       const response = await authService.changePassword(data)
@@ -531,6 +568,7 @@ export function PortalAuthProvider({ children }: { children: ReactNode }) {
     acceptInvitation,
     registerCorporateMember,
     refreshProfile,
+    updateProfile,
     changePassword,
     forgotPassword,
     resetPassword,

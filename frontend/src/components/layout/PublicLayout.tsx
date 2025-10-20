@@ -3,6 +3,7 @@
 import { useState, ReactNode } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
+import { usePortalAuth } from '@/hooks/usePortalAuth'
 import { useRouter } from 'next/navigation'
 
 interface PublicLayoutProps {
@@ -11,11 +12,22 @@ interface PublicLayoutProps {
 
 export default function PublicLayout({ children }: PublicLayoutProps) {
   const { user, isAuthenticated, logout } = useAuth()
+  const { user: portalUser, isAuthenticated: isPortalAuth, logout: portalLogout } = usePortalAuth()
   const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
+  // Get the current authenticated user from either auth system
+  const currentUser = portalUser || user
+  const isUserAuthenticated = isAuthenticated || isPortalAuth
+
   const handleLogout = async () => {
-    await logout()
+    // Logout from both systems
+    if (isPortalAuth) {
+      await portalLogout()
+    }
+    if (isAuthenticated) {
+      await logout()
+    }
     router.push('/')
   }
 
@@ -40,18 +52,18 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
             </div>
             <div className="flex items-center">
               <div className="hidden sm:ml-6 sm:flex sm:space-x-4">
-                {isAuthenticated ? (
+                {isUserAuthenticated ? (
                   <>
                     <span className="text-gray-600 px-3 py-2 rounded-lg text-sm font-medium font-sans bg-gray-100">
-                      สวัสดี, {user?.username}
+                      สวัสดี, {currentUser?.username}
                     </span>
                     
                     {/* Show different options based on user role */}
-                    {(user?.role === 'admin' ||
-                      user?.role === 'dede_head' ||
-                      user?.role === 'dede_staff' ||
-                      user?.role === 'dede_consult' ||
-                      user?.role === 'auditor') && (
+                    {(currentUser?.role === 'admin' ||
+                      currentUser?.role === 'dede_head' ||
+                      currentUser?.role === 'dede_staff' ||
+                      currentUser?.role === 'dede_consult' ||
+                      currentUser?.role === 'auditor') && (
                       <Link
                         href="/eservice/dede/officer/dashboard"
                         className="text-gray-600 hover:text-green-600 px-3 py-2 rounded-lg text-sm font-medium font-sans hover:bg-green-50 transition-colors duration-200"
@@ -69,10 +81,10 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                   </>
                 ) : (
                   <>
-                    <Link href="/login" className="text-gray-600 hover:text-green-600 px-3 py-2 rounded-lg text-sm font-medium font-sans hover:bg-green-50 transition-colors duration-200">
+                    <Link href="/" className="text-gray-600 hover:text-green-600 px-3 py-2 rounded-lg text-sm font-medium font-sans hover:bg-green-50 transition-colors duration-200">
                       เข้าสู่ระบบ
                     </Link>
-                    <Link href="/register" className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium font-sans shadow-md transition-all duration-200">
+                    <Link href="/" className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium font-sans shadow-md transition-all duration-200">
                       สมัครสมาชิก
                     </Link>
                   </>
@@ -106,20 +118,20 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
               {/* Contact Us link removed */}
             </div>
             <div className="pt-4 pb-3 border-t border-gray-200">
-              {isAuthenticated ? (
+              {isUserAuthenticated ? (
                 <div className="flex flex-col items-start space-y-2">
                   <div className="flex-shrink-0">
                     <span className="text-gray-600 px-3 py-2 rounded-lg text-sm font-medium font-sans bg-gray-100">
-                      สวัสดี, {user?.username}
+                      สวัสดี, {currentUser?.username}
                     </span>
                   </div>
                   
                   {/* Show different options based on user role */}
-                  {(user?.role === 'admin' ||
-                    user?.role === 'dede_head' ||
-                    user?.role === 'dede_staff' ||
-                    user?.role === 'dede_consult' ||
-                    user?.role === 'auditor') && (
+                  {(currentUser?.role === 'admin' ||
+                    currentUser?.role === 'dede_head' ||
+                    currentUser?.role === 'dede_staff' ||
+                    currentUser?.role === 'dede_consult' ||
+                    currentUser?.role === 'auditor') && (
                     <div className="flex-shrink-0">
                       <Link
                         href="/eservice/dede/officer/dashboard"
@@ -142,12 +154,12 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
               ) : (
                 <div className="flex flex-col space-y-2 px-4">
                   <div className="flex-shrink-0">
-                    <Link href="/login" className="text-gray-600 hover:text-green-600 px-3 py-2 rounded-lg text-sm font-medium font-sans hover:bg-green-50 transition-colors duration-200">
+                    <Link href="/" className="text-gray-600 hover:text-green-600 px-3 py-2 rounded-lg text-sm font-medium font-sans hover:bg-green-50 transition-colors duration-200">
                       เข้าสู่ระบบ
                     </Link>
                   </div>
                   <div>
-                    <Link href="/register" className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium font-sans shadow-md transition-all duration-200">
+                    <Link href="/" className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium font-sans shadow-md transition-all duration-200">
                       สมัครสมาชิก
                     </Link>
                   </div>
@@ -189,7 +201,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                   <ul className="mt-4 space-y-4">
                     {/* Contact Us link removed */}
                     <li>
-                      {isAuthenticated ? (
+                      {isUserAuthenticated ? (
                         <button
                           onClick={handleLogout}
                           className="text-base text-gray-300 hover:text-white font-sans transition-colors duration-200"
@@ -197,7 +209,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                           ออกจากระบบ
                         </button>
                       ) : (
-                        <Link href="/login" className="text-base text-gray-300 hover:text-white font-sans transition-colors duration-200">
+                        <Link href="/" className="text-base text-gray-300 hover:text-white font-sans transition-colors duration-200">
                           เข้าสู่ระบบ
                         </Link>
                       )}

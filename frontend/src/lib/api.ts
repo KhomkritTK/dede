@@ -22,7 +22,8 @@ class ApiClient {
                                window.location.pathname.startsWith('/admin-portal') ||
                                window.location.pathname.startsWith('/eservice/dede/officer') ||
                                window.location.pathname.startsWith('/login-portal') ||
-                               window.location.pathname.startsWith('/web-portal')
+                               window.location.pathname.startsWith('/web-portal') ||
+                               window.location.pathname.startsWith('/eservice/dede')
           
           const tokenKey = isPortalRoute ? 'portal_token' : 'token'
           const token = localStorage.getItem(tokenKey)
@@ -49,7 +50,8 @@ class ApiClient {
             const isPortalRoute = window.location.pathname.startsWith('/admin-portal') ||
                                  window.location.pathname.startsWith('/eservice/dede/officer') ||
                                  window.location.pathname.startsWith('/login-portal') ||
-                                 window.location.pathname.startsWith('/web-portal')
+                                 window.location.pathname.startsWith('/web-portal') ||
+                                 window.location.pathname.startsWith('/eservice/dede')
             
             const tokenKey = isPortalRoute ? 'portal_token' : 'token'
             const refreshTokenKey = isPortalRoute ? 'portal_refreshToken' : 'refreshToken'

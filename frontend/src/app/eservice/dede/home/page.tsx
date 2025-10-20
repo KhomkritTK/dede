@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
+import { usePortalAuth } from '@/hooks/usePortalAuth'
 import { useQuery } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api'
 import PublicLayout from '@/components/layout/PublicLayout'
@@ -40,31 +41,39 @@ interface UnifiedLicenseRequest {
 
 export default function UserDashboardPage() {
   const { user, isAuthenticated, isLoading } = useAuth()
+  const { user: portalUser, isAuthenticated: isPortalAuth, isLoading: isPortalLoading } = usePortalAuth()
   const router = useRouter()
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
 
-  // Redirect if not authenticated
+  // Redirect if not authenticated (check both auth systems)
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    const isLoaded = !isLoading && !isPortalLoading
+    const hasAuth = isAuthenticated || isPortalAuth
+    
+    if (isLoaded && !hasAuth) {
       router.push('/')
       return
     }
-  }, [isAuthenticated, isLoading, router])
+  }, [isAuthenticated, isPortalAuth, isLoading, isPortalLoading, router])
 
   // Redirect admin users to admin portal
   useEffect(() => {
-    if (!isLoading && isAuthenticated && user) {
+    const isLoaded = !isLoading && !isPortalLoading
+    const currentUser = portalUser || user
+    const hasAuth = isAuthenticated || isPortalAuth
+    
+    if (isLoaded && hasAuth && currentUser) {
       const adminRoles = [
         'admin', 'system_admin', 'dede_head_admin', 'dede_staff_admin', 'dede_consult_admin', 'auditor_admin',
         'dede_head', 'dede_staff', 'dede_consult', 'auditor'
       ]
       
-      if (adminRoles.includes(user.role)) {
+      if (adminRoles.includes(currentUser.role)) {
         router.push('/admin-portal/dashboard')
         return
       }
     }
-  }, [isAuthenticated, isLoading, router, user])
+  }, [isAuthenticated, isPortalAuth, isLoading, isPortalLoading, router, user, portalUser])
 
   // Fetch license requests from admin portal services
   const { data: requests, isLoading: requestsLoading, refetch } = useQuery({
@@ -73,7 +82,7 @@ export default function UserDashboardPage() {
       const response = await apiClient.get<UnifiedLicenseRequest[]>('/api/v1/admin-portal/services/requests')
       return response.data
     },
-    enabled: isAuthenticated,
+    enabled: isAuthenticated || isPortalAuth,
     // Refetch when window gains focus (when user switches back from admin portal)
     refetchOnWindowFocus: true,
   })
@@ -113,15 +122,15 @@ export default function UserDashboardPage() {
   const getStatusText = (status: string) => {
     switch (status) {
       case 'new_request':
-        return 'คำร้องใหม่'
+        return 'เอกสารถูกส่งให้ DEDE Admin'
       case 'accepted':
-        return 'รับคำขอ'
+        return 'DEDE Admin รับคำขอแล้ว'
       case 'assigned':
-        return 'มอบหมายผู้ตรวจ'
+        return 'มอบหมายให้เจ้าหน้าที่ตรวจสอบ'
       case 'appointment':
-        return 'นัดหมาย'
+        return 'นัดหมายวันเข้าตรวจสอบ'
       case 'inspecting':
-        return 'เข้าตรวจสอบระบบ'
+        return 'กำลังดำเนินการตรวจสอบ'
       case 'inspection_done':
         return 'ตรวจสอบเสร็จสิ้น'
       case 'document_edit':
@@ -129,13 +138,13 @@ export default function UserDashboardPage() {
       case 'report_approved':
         return 'รับรองรายงาน'
       case 'approved':
-        return 'อนุมัติใบอนุญาต'
+        return 'อนุมัติใบอนุญาตแล้ว'
       case 'rejected':
         return 'ปฏิเสธคำขอ'
       case 'rejected_final':
         return 'ปฏิเสธสุดท้าย'
       case 'returned':
-        return 'ตีเอกสารกลับไปแก้ไข'
+        return 'เอกสารถูกตีกลับเพื่อแก้ไข'
       case 'forwarded':
         return 'ส่งต่อให้ DEDE Head'
       default:
@@ -222,7 +231,7 @@ export default function UserDashboardPage() {
     }
   }
 
-  if (isLoading || !isAuthenticated) {
+  if ((isLoading || !isAuthenticated) && (isPortalLoading || !isPortalAuth)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50">
         <div className="text-center">
@@ -297,90 +306,103 @@ export default function UserDashboardPage() {
               <div className="h-8 w-8 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg flex items-center justify-center mr-3">
                 <DocumentTextIcon className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 font-sans">สถานะเอกสาร (Web Portal)</h3>
+              <h3 className="text-xl font-semibold text-gray-900 font-sans">สถานะเอกสาร</h3>
             </div>
           </div>
           <div className="overflow-hidden">
             {requestsLoading ? (
-              <div className="px-6 py-10 sm:p-6 text-center">
-                <div className="animate-spin rounded-full h-14 w-14 border-b-4 border-blue-600 mx-auto"></div>
-                <p className="mt-4 text-gray-600 font-medium font-sans">กำลังโหลดข้อมูล...</p>
+              <div className="px-6 py-12 sm:p-6 text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-gray-600 font-medium font-sans">กำลังโหลดข้อมูลเอกสาร...</p>
               </div>
             ) : requests && requests.length > 0 ? (
               <ul className="divide-y divide-gray-100">
                 {requests.map((request) => (
-                  <li key={request.id} className="transform transition-all duration-200 hover:bg-gray-50 hover:scale-[1.01]">
-                    <div className="px-6 py-5 sm:px-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center flex-1">
-                          <div className="flex-shrink-0 mr-4 p-2 bg-gray-50 rounded-lg">
+                  <li key={request.id} className="transform transition-all duration-200 hover:bg-blue-50 hover:shadow-md">
+                    <div className="px-6 py-4 sm:px-6">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start flex-1">
+                          <div className="flex-shrink-0 mr-4 p-3 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl shadow-sm">
                             {getStatusIcon(request.status)}
                           </div>
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between">
-                              <p className="text-sm font-semibold text-blue-600 font-sans">
-                                {request.request_number}
-                              </p>
-                              <div className="flex items-center space-x-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-2">
+                              <div>
+                                <p className="text-sm font-bold text-blue-600 font-sans">
+                                  📄 {request.request_number}
+                                </p>
+                                <p className="text-lg font-semibold text-gray-900 font-sans mt-1">
+                                  {request.title}
+                                </p>
+                              </div>
+                              <div className="flex items-center space-x-2 ml-4">
                                 {request.status === 'returned' && (
                                   <Link
                                     href={`/eservice/dede/requests/${request.id}`}
-                                    className="inline-flex items-center px-3 py-1 border border-orange-300 shadow-sm text-xs leading-4 font-medium rounded-md text-orange-700 bg-white hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                                    className="inline-flex items-center px-3 py-2 border border-orange-300 shadow-sm text-sm leading-4 font-medium rounded-lg text-orange-700 bg-white hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors duration-200"
                                   >
-                                    <PencilIcon className="h-3 w-3 mr-1" />
+                                    <PencilIcon className="h-4 w-4 mr-1" />
                                     แก้ไขเอกสาร
                                   </Link>
                                 )}
                                 <Link
                                   href={`/eservice/dede/requests/${request.id}`}
-                                  className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                  className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
                                 >
-                                  <EyeIcon className="h-3 w-3 mr-1" />
+                                  <EyeIcon className="h-4 w-4 mr-1" />
                                   ดูรายละเอียด
                                 </Link>
                               </div>
                             </div>
-                            <p className="text-base font-medium text-gray-900 font-sans mt-1">
-                              {request.title}
-                            </p>
-                            <div className="flex items-center mt-2 space-x-3">
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 font-sans">
-                                {getLicenseTypeDisplayName(request.license_type)}
+                            
+                            <div className="flex flex-wrap items-center gap-2 mb-3">
+                              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 font-sans">
+                                📋 {getLicenseTypeDisplayName(request.license_type)}
                               </span>
-                              <span className="text-xs text-gray-500 font-sans flex items-center">
+                              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 font-sans">
                                 <ClockIcon className="h-3 w-3 mr-1" />
                                 ส่งเมื่อ {new Date(request.request_date).toLocaleDateString('th-TH')}
                               </span>
-                              <span className="text-xs text-gray-500 font-sans">
-                                ผู้ยื่น: {request.user.full_name}
+                              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 font-sans">
+                                👤 {request.user.full_name}
                               </span>
                             </div>
+                            
                             {request.status === 'returned' && (
-                              <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-md">
+                              <div className="mb-3 p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg">
                                 <div className="flex items-start">
-                                  <InformationCircleIcon className="h-4 w-4 text-amber-600 mt-0.5 mr-2 flex-shrink-0" />
-                                  <div className="text-xs text-amber-800">
-                                    <p className="font-medium">เอกสารถูกตีกลับเพื่อแก้ไข</p>
-                                    <p className="mt-1">กรุณาแก้ไขเอกสารตามที่ระบุและส่งใหม่อีกครั้ง</p>
+                                  <div className="flex-shrink-0">
+                                    <span className="text-amber-600 text-lg">⚠️</span>
+                                  </div>
+                                  <div className="ml-3">
+                                    <p className="text-sm font-medium text-amber-800">📝 เอกสารถูกตีกลับเพื่อแก้ไข</p>
+                                    <p className="text-xs text-amber-700 mt-1">กรุณาแก้ไขเอกสารตามที่ระบุและส่งใหม่อีกครั้ง</p>
                                   </div>
                                 </div>
                               </div>
                             )}
-                            <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                            
+                            <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
                               <div className="flex items-start">
-                                <InformationCircleIcon className="h-4 w-4 text-blue-600 mt-0.5 mr-2 flex-shrink-0" />
-                                <div className="text-xs text-blue-800">
-                                  <p className="font-medium">สถานะปัจจุบัน: {getStatusText(request.status)}</p>
-                                  <p className="mt-1">เอกสารอยู่ในขั้นตอน: {getFlowStep(request.status)}</p>
+                                <div className="flex-shrink-0">
+                                  <span className="text-blue-600 text-lg">ℹ️</span>
+                                </div>
+                                <div className="ml-3">
+                                  <p className="text-sm font-medium text-blue-900">
+                                    เอกสาร <span className="font-bold">{request.request_number}</span> {getStatusText(request.status)}
+                                  </p>
+                                  <p className="text-xs text-blue-700 mt-1">
+                                    📍 ขั้นตอนถัดไป: {getFlowStep(request.status)}
+                                  </p>
                                 </div>
                               </div>
                             </div>
                           </div>
                         </div>
                         <div className="ml-4 flex-shrink-0">
-                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium font-sans shadow-sm ${getStatusColor(request.status)}`}>
+                          <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium font-sans shadow-sm ${getStatusColor(request.status)}`}>
                             {getStatusIcon(request.status)}
-                            <span className="ml-1">{getStatusText(request.status)}</span>
+                            <span className="ml-2">{getStatusText(request.status)}</span>
                           </span>
                         </div>
                       </div>
@@ -409,19 +431,7 @@ export default function UserDashboardPage() {
               </div>
             )}
           </div>
-          {requests && requests.length > 0 && (
-            <div className="px-6 py-4 sm:px-6 bg-gray-50 text-right">
-              <a
-                href="/web-portal"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-500 font-sans transition-colors duration-200"
-              >
-                ดูสถานะใน Web Portal
-                <ArrowRightIcon className="h-4 w-4 ml-1" />
-              </a>
-            </div>
-          )}
+          {/* No footer link needed */}
         </div>
       </div>
     </PublicLayout>
