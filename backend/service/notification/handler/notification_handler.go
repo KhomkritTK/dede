@@ -1,36 +1,29 @@
 package handler
 
 import (
-	"strconv"
-
 	"eservice-backend/config"
-	"eservice-backend/models"
-	"eservice-backend/repository"
+	"eservice-backend/middleware"
 	"eservice-backend/service/notification/dto"
-	"eservice-backend/service/notification/usecase"
+	"eservice-backend/service/notification/service"
 	"eservice-backend/utils"
+	"fmt"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 type NotificationHandler struct {
-	notificationUsecase usecase.NotificationUsecase
-	config              *config.Config
+	notificationService service.NotificationService
 }
 
-func NewNotificationHandler(db *gorm.DB, config *config.Config) *NotificationHandler {
-	notificationRepo := repository.NewNotificationRepository(db)
-	userRepo := repository.NewUserRepository(db)
-	notificationUsecase := usecase.NewNotificationUsecase(notificationRepo, userRepo)
-
+func NewNotificationHandler(db *gorm.DB, cfg *config.Config) *NotificationHandler {
 	return &NotificationHandler{
-		notificationUsecase: notificationUsecase,
-		config:              config,
+		notificationService: service.NewNotificationService(db),
 	}
 }
 
-// CreateNotification handles creating a new notification
+// CreateNotification creates a new notification
 func (h *NotificationHandler) CreateNotification(c *gin.Context) {
 	var req dto.CreateNotificationRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -38,210 +31,335 @@ func (h *NotificationHandler) CreateNotification(c *gin.Context) {
 		return
 	}
 
-	response, err := h.notificationUsecase.CreateNotification(req)
-	if err != nil {
-		utils.ErrorBadRequest(c, err.Error(), nil)
+	if err := h.notificationService.CreateNotification(req); err != nil {
+		utils.ErrorInternalServerError(c, "Failed to create notification", err)
 		return
 	}
 
-	utils.SuccessCreated(c, "Notification created successfully", response)
+	utils.SuccessCreated(c, "Notification created successfully", nil)
 }
 
-// GetNotifications handles getting notifications
+// GetNotifications retrieves notifications for the current user
 func (h *NotificationHandler) GetNotifications(c *gin.Context) {
-	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
-	recipientID, _ := strconv.ParseUint(c.Query("recipient_id"), 10, 32)
-	recipientRole := c.Query("recipient_role")
-
-	response, err := h.notificationUsecase.GetNotifications(
-		page,
-		limit,
-		uint(recipientID),
-		recipientRole,
-	)
-	if err != nil {
-		utils.ErrorInternalServerError(c, "Failed to retrieve notifications", err)
-		return
-	}
-
-	utils.SuccessOK(c, "Notifications retrieved successfully", response)
-}
-
-// GetNotification handles getting a specific notification
-func (h *NotificationHandler) GetNotification(c *gin.Context) {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
-	if err != nil {
-		utils.ErrorBadRequest(c, "Invalid notification ID", err)
-		return
-	}
-
-	response, err := h.notificationUsecase.GetNotificationByID(uint(id))
-	if err != nil {
-		utils.ErrorNotFound(c, "Notification not found", err)
-		return
-	}
-
-	utils.SuccessOK(c, "Notification retrieved successfully", response)
-}
-
-// GetMyNotifications handles getting the current user's notifications
-func (h *NotificationHandler) GetMyNotifications(c *gin.Context) {
+	// Get current user ID from context
 	userID, exists := c.Get("user_id")
 	if !exists {
 		utils.ErrorUnauthorized(c, "User not authenticated", nil)
 		return
 	}
 
-	id, ok := userID.(uint)
-	if !ok {
-		utils.ErrorInternalServerError(c, "Invalid user ID", nil)
+	// Get query parameters
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	req := dto.GetNotificationsRequest{
+		Page:          page,
+		Limit:         limit,
+		Type:          c.Query("type"),
+		Priority:      c.Query("priority"),
+		RecipientRole: c.Query("recipient_role"),
+	}
+
+	// Parse is_read parameter
+	if isReadStr := c.Query("is_read"); isReadStr != "" {
+		isRead := isReadStr == "true"
+		req.IsRead = &isRead
+	}
+
+	// Parse date range parameters
+	if startDateStr := c.Query("start_date"); startDateStr != "" {
+		startDate, err := utils.ParseDate(startDateStr)
+		if err == nil {
+			req.StartDate = &startDate
+		}
+	}
+
+	if endDateStr := c.Query("end_date"); endDateStr != "" {
+		endDate, err := utils.ParseDate(endDateStr)
+		if err == nil {
+			req.EndDate = &endDate
+		}
+	}
+
+	notifications, total, err := h.notificationService.GetNotifications(userID.(uint), req)
+	if err != nil {
+		utils.ErrorInternalServerError(c, "Failed to get notifications", err)
 		return
 	}
 
-	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	// Format response
+	var notificationList []dto.NotificationResponse
+	for _, notification := range notifications {
+		notificationList = append(notificationList, dto.NotificationResponse{
+			ID:            notification.ID,
+			Title:         notification.Title,
+			Message:       notification.Message,
+			Type:          string(notification.Type),
+			Priority:      string(notification.Priority),
+			RecipientID:   notification.RecipientID,
+			RecipientRole: string(*notification.RecipientRole),
+			EntityType:    notification.EntityType,
+			EntityID:      notification.EntityID,
+			ActionURL:     notification.ActionURL,
+			ReadAt:        notification.ReadAt,
+			CreatedAt:     notification.CreatedAt,
+		})
+	}
 
-	response, err := h.notificationUsecase.GetNotifications(page, limit, id, "")
-	if err != nil {
-		utils.ErrorInternalServerError(c, "Failed to retrieve notifications", err)
-		return
+	response := gin.H{
+		"notifications": notificationList,
+		"pagination": gin.H{
+			"page":       page,
+			"limit":      limit,
+			"total":      total,
+			"totalPages": (total + int64(limit) - 1) / int64(limit),
+		},
 	}
 
 	utils.SuccessOK(c, "Notifications retrieved successfully", response)
 }
 
-// GetUnreadNotifications handles getting unread notifications
-func (h *NotificationHandler) GetUnreadNotifications(c *gin.Context) {
-	userID, exists := c.Get("user_id")
-	if !exists {
-		utils.ErrorUnauthorized(c, "User not authenticated", nil)
-		return
-	}
-
-	id, ok := userID.(uint)
-	if !ok {
-		utils.ErrorInternalServerError(c, "Invalid user ID", nil)
-		return
-	}
-
-	response, err := h.notificationUsecase.GetUnreadNotifications(id)
-	if err != nil {
-		utils.ErrorInternalServerError(c, "Failed to retrieve notifications", err)
-		return
-	}
-
-	utils.SuccessOK(c, "Unread notifications retrieved successfully", response)
-}
-
-// MarkAsRead handles marking a notification as read
+// MarkAsRead marks a notification as read
 func (h *NotificationHandler) MarkAsRead(c *gin.Context) {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	notificationIDStr := c.Param("id")
+	notificationID, err := strconv.ParseUint(notificationIDStr, 10, 32)
 	if err != nil {
 		utils.ErrorBadRequest(c, "Invalid notification ID", err)
 		return
 	}
 
-	if err := h.notificationUsecase.MarkAsRead(uint(id)); err != nil {
-		utils.ErrorBadRequest(c, err.Error(), nil)
-		return
-	}
-
-	utils.SuccessOK(c, "Notification marked as read", nil)
-}
-
-// MarkAllAsRead handles marking all notifications as read
-func (h *NotificationHandler) MarkAllAsRead(c *gin.Context) {
+	// Get current user ID from context
 	userID, exists := c.Get("user_id")
 	if !exists {
 		utils.ErrorUnauthorized(c, "User not authenticated", nil)
 		return
 	}
 
-	id, ok := userID.(uint)
-	if !ok {
-		utils.ErrorInternalServerError(c, "Invalid user ID", nil)
+	if err := h.notificationService.MarkAsRead(uint(notificationID), userID.(uint)); err != nil {
+		utils.ErrorInternalServerError(c, "Failed to mark notification as read", err)
 		return
 	}
 
-	if err := h.notificationUsecase.MarkAllAsRead(id); err != nil {
-		utils.ErrorBadRequest(c, err.Error(), nil)
-		return
-	}
-
-	utils.SuccessOK(c, "All notifications marked as read", nil)
+	utils.SuccessOK(c, "Notification marked as read successfully", nil)
 }
 
-// DeleteNotification handles deleting a notification
+// MarkAllAsRead marks all notifications for the current user as read
+func (h *NotificationHandler) MarkAllAsRead(c *gin.Context) {
+	// Get current user ID from context
+	userID, exists := c.Get("user_id")
+	if !exists {
+		utils.ErrorUnauthorized(c, "User not authenticated", nil)
+		return
+	}
+
+	if err := h.notificationService.MarkAllAsRead(userID.(uint)); err != nil {
+		utils.ErrorInternalServerError(c, "Failed to mark all notifications as read", err)
+		return
+	}
+
+	utils.SuccessOK(c, "All notifications marked as read successfully", nil)
+}
+
+// DeleteNotification deletes a notification
 func (h *NotificationHandler) DeleteNotification(c *gin.Context) {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	notificationIDStr := c.Param("id")
+	notificationID, err := strconv.ParseUint(notificationIDStr, 10, 32)
 	if err != nil {
 		utils.ErrorBadRequest(c, "Invalid notification ID", err)
 		return
 	}
 
-	if err := h.notificationUsecase.DeleteNotification(uint(id)); err != nil {
-		utils.ErrorBadRequest(c, err.Error(), nil)
+	// Get current user ID from context
+	userID, exists := c.Get("user_id")
+	if !exists {
+		utils.ErrorUnauthorized(c, "User not authenticated", nil)
+		return
+	}
+
+	if err := h.notificationService.DeleteNotification(uint(notificationID), userID.(uint)); err != nil {
+		utils.ErrorInternalServerError(c, "Failed to delete notification", err)
 		return
 	}
 
 	utils.SuccessOK(c, "Notification deleted successfully", nil)
 }
 
-// GetNotificationCount handles getting notification count
-func (h *NotificationHandler) GetNotificationCount(c *gin.Context) {
+// BroadcastNotification sends a notification to multiple recipients
+func (h *NotificationHandler) BroadcastNotification(c *gin.Context) {
+	var req dto.BroadcastNotificationRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.ErrorBadRequest(c, "Invalid request body", err)
+		return
+	}
+
+	if err := h.notificationService.BroadcastNotification(req); err != nil {
+		utils.ErrorInternalServerError(c, "Failed to broadcast notification", err)
+		return
+	}
+
+	utils.SuccessOK(c, "Notification broadcasted successfully", nil)
+}
+
+// GetUnreadCount returns the count of unread notifications for the current user
+func (h *NotificationHandler) GetUnreadCount(c *gin.Context) {
+	// Get current user ID from context
 	userID, exists := c.Get("user_id")
 	if !exists {
 		utils.ErrorUnauthorized(c, "User not authenticated", nil)
 		return
 	}
 
-	id, ok := userID.(uint)
-	if !ok {
-		utils.ErrorInternalServerError(c, "Invalid user ID", nil)
-		return
-	}
-
-	response, err := h.notificationUsecase.GetNotificationCount(id)
+	count, err := h.notificationService.GetUnreadCount(userID.(uint))
 	if err != nil {
-		utils.ErrorInternalServerError(c, "Failed to retrieve notification count", err)
+		utils.ErrorInternalServerError(c, "Failed to get unread count", err)
 		return
 	}
 
-	utils.SuccessOK(c, "Notification count retrieved successfully", response)
+	response := gin.H{
+		"unread_count": count,
+	}
+
+	utils.SuccessOK(c, "Unread count retrieved successfully", response)
 }
 
-// GetNotificationTypes handles getting notification types
-func (h *NotificationHandler) GetNotificationTypes(c *gin.Context) {
-	response := h.notificationUsecase.GetNotificationTypes()
-	utils.SuccessOK(c, "Notification types retrieved successfully", response)
-}
-
-// GetNotificationPriorities handles getting notification priorities
-func (h *NotificationHandler) GetNotificationPriorities(c *gin.Context) {
-	response := h.notificationUsecase.GetNotificationPriorities()
-	utils.SuccessOK(c, "Notification priorities retrieved successfully", response)
-}
-
-// SendNotifications handles sending unsent notifications (admin only)
-func (h *NotificationHandler) SendNotifications(c *gin.Context) {
-	// Check if user is admin or DEDE head
-	userRole, exists := c.Get("user_role")
+// GetNotificationSettings returns notification settings for the current user
+func (h *NotificationHandler) GetNotificationSettings(c *gin.Context) {
+	// Get current user ID from context
+	userID, exists := c.Get("user_id")
 	if !exists {
 		utils.ErrorUnauthorized(c, "User not authenticated", nil)
 		return
 	}
 
-	role, ok := userRole.(models.UserRole)
-	if !ok || (role != models.RoleAdmin && role != models.RoleDEDEHead) {
-		utils.ErrorForbidden(c, "Insufficient permissions", nil)
+	settings, err := h.notificationService.GetNotificationSettings(userID.(uint))
+	if err != nil {
+		utils.ErrorInternalServerError(c, "Failed to get notification settings", err)
 		return
 	}
 
-	if err := h.notificationUsecase.SendUnsentNotifications(); err != nil {
-		utils.ErrorInternalServerError(c, "Failed to send notifications", err)
+	utils.SuccessOK(c, "Notification settings retrieved successfully", settings)
+}
+
+// UpdateNotificationSettings updates notification settings for the current user
+func (h *NotificationHandler) UpdateNotificationSettings(c *gin.Context) {
+	var req dto.UpdateNotificationSettingsRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.ErrorBadRequest(c, "Invalid request body", err)
 		return
 	}
 
-	utils.SuccessOK(c, "Notifications sent successfully", nil)
+	// Get current user ID from context
+	userID, exists := c.Get("user_id")
+	if !exists {
+		utils.ErrorUnauthorized(c, "User not authenticated", nil)
+		return
+	}
+
+	if err := h.notificationService.UpdateNotificationSettings(userID.(uint), req); err != nil {
+		utils.ErrorInternalServerError(c, "Failed to update notification settings", err)
+		return
+	}
+
+	utils.SuccessOK(c, "Notification settings updated successfully", nil)
+}
+
+// CreateStateChangeNotification creates a notification for state changes
+func (h *NotificationHandler) CreateStateChangeNotification(c *gin.Context) {
+	var req dto.StateChangeNotificationRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.ErrorBadRequest(c, "Invalid request body", err)
+		return
+	}
+
+	// Create a state change notification manually
+	title := "สถานะคำขอเปลี่ยนแล้ว"
+	message := fmt.Sprintf("คำขอเลขที่ %d เปลี่ยนสถานะจาก %s เป็น %s", req.RequestID, req.FromStatus, req.ToStatus)
+
+	// Create notification for each recipient
+	for _, recipientID := range req.Recipients {
+		notificationReq := dto.CreateNotificationRequest{
+			Title:       title,
+			Message:     message,
+			Type:        "state_changed",
+			Priority:    "normal",
+			RecipientID: &recipientID,
+			EntityType:  "license_request",
+			EntityID:    &req.RequestID,
+			ActionURL:   fmt.Sprintf("/admin-portal/services/%d", req.RequestID),
+		}
+
+		if err := h.notificationService.CreateNotification(notificationReq); err != nil {
+			utils.ErrorInternalServerError(c, "Failed to create state change notification", err)
+			return
+		}
+	}
+
+	// Create notification for each role
+	for _, role := range req.Roles {
+		notificationReq := dto.CreateNotificationRequest{
+			Title:         title,
+			Message:       message,
+			Type:          "state_changed",
+			Priority:      "normal",
+			RecipientRole: role,
+			EntityType:    "license_request",
+			EntityID:      &req.RequestID,
+			ActionURL:     fmt.Sprintf("/admin-portal/services/%d", req.RequestID),
+		}
+
+		if err := h.notificationService.CreateNotification(notificationReq); err != nil {
+			utils.ErrorInternalServerError(c, "Failed to create state change notification", err)
+			return
+		}
+	}
+
+	utils.SuccessOK(c, "State change notification created successfully", nil)
+}
+
+// SetNotificationRoutes sets up routes for notification functionality
+func SetNotificationRoutes(r *gin.RouterGroup, db *gorm.DB, cfg *config.Config) {
+	// Create notification handler
+	notificationHandler := NewNotificationHandler(db, cfg)
+
+	// Notification routes (protected)
+	notifications := r.Group("/notifications")
+	notifications.Use(middleware.AuthMiddleware(cfg.JWTSecret))
+	{
+		// Get notifications
+		notifications.GET("", notificationHandler.GetNotifications)
+
+		// Get unread count
+		notifications.GET("/unread-count", notificationHandler.GetUnreadCount)
+
+		// Mark as read
+		notifications.POST("/:id/read", notificationHandler.MarkAsRead)
+
+		// Mark all as read
+		notifications.POST("/read-all", notificationHandler.MarkAllAsRead)
+
+		// Delete notification
+		notifications.DELETE("/:id", notificationHandler.DeleteNotification)
+
+		// Get notification settings
+		notifications.GET("/settings", notificationHandler.GetNotificationSettings)
+
+		// Update notification settings
+		notifications.PUT("/settings", notificationHandler.UpdateNotificationSettings)
+
+		// Create state change notification (admin only)
+		notifications.POST("/state-change",
+			middleware.RequireRole([]string{"admin", "dede_head", "dede_staff", "dede_consult"}),
+			notificationHandler.CreateStateChangeNotification)
+	}
+
+	// Admin notification routes (admin only)
+	adminNotifications := r.Group("/admin/notifications")
+	adminNotifications.Use(middleware.AuthMiddleware(cfg.JWTSecret))
+	adminNotifications.Use(middleware.RequireRole([]string{"admin"}))
+	{
+		// Create notification
+		adminNotifications.POST("", notificationHandler.CreateNotification)
+
+		// Broadcast notification
+		adminNotifications.POST("/broadcast", notificationHandler.BroadcastNotification)
+	}
 }

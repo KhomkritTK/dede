@@ -58,6 +58,21 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB, cfg *config.Config) {
 
 			// Notification routes
 			NotificationRoutes(protected, db, cfg)
+
+			// Workflow routes
+			WorkflowRoutes(protected, db, cfg)
+
+			// DEDE Admin routes
+			DedeAdminRoutes(protected, db, cfg)
+
+			// DEDE Head routes
+			DedeHeadRoutes(protected, db, cfg)
+
+			// DEDE Consults routes
+			DedeConsultsRoutes(protected, db, cfg)
+
+			// DEDE Staff routes
+			DedeStaffRoutes(protected, db, cfg)
 		}
 	}
 }

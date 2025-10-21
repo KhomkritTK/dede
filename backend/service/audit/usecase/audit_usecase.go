@@ -275,7 +275,9 @@ func (u *auditUsecase) UpdateAuditReport(id uint, req dto.UpdateAuditReportReque
 	if req.CorrectiveActions != "" {
 		report.CorrectiveActions = req.CorrectiveActions
 	}
-	report.FollowUpRequired = req.FollowUpRequired
+	if req.FollowUpRequired != nil {
+		report.FollowUpRequired = *req.FollowUpRequired
+	}
 	report.FollowUpDate = req.FollowUpDate
 
 	// If report was in needs_edit status, change it back to draft

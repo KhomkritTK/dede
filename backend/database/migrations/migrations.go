@@ -24,5 +24,11 @@ func Migrate(db *gorm.DB) error {
 		&models.Notification{},
 		&models.ServiceFlowLog{},
 		&models.AdminUser{},
+		&models.TaskAssignment{},
+		&models.AuditReportVersion{},
+		&models.WorkflowComment{},
+		&models.DeadlineReminder{},
+		&models.RoleDashboard{},
+		&models.WorkflowMetric{},
 	)
 }
