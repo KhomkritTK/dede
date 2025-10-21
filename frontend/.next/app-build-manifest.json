@@ -11,11 +11,6 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/admin-portal/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin-portal/page.js"
-    ],
     "/admin-portal/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -26,35 +21,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/admin-portal/dashboard/page.js"
     ],
-    "/admin-portal/services/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin-portal/services/page.js"
-    ],
     "/eservice/dede/home/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/eservice/dede/home/page.js"
-    ],
-    "/eservice/dede/license/new/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/eservice/dede/license/new/page.js"
-    ],
-    "/eservice/dede/requests/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/eservice/dede/requests/[id]/page.js"
-    ],
-    "/eservice/dede/license/renewal/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/eservice/dede/license/renewal/page.js"
-    ],
-    "/eservice/dede/license/extension/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/eservice/dede/license/extension/page.js"
     ]
   }
 }

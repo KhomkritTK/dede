@@ -423,47 +423,590 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="h-10 w-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">DE</span>
+      {/* Main Content */}
+      <div className="flex flex-col lg:flex-row min-h-screen">
+        {/* Left Side - Login Form */}
+        <div className="w-full lg:w-1/2 bg-white flex flex-col justify-center items-center p-8 lg:p-12">
+          <div className="w-full max-w-md">
+            {/* Logo */}
+            <div className="flex justify-center mb-8">
+              <div className="flex items-center">
+                <div className="h-12 w-12 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
+                  <span className="text-white font-bold text-xl">DE</span>
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">DEDE E-Service</h1>
+                  <p className="text-sm text-gray-500">ระบบบริการอิเล็กทรอนิกส์</p>
                 </div>
               </div>
-              <div className="ml-4">
-                <h1 className="text-xl font-bold text-gray-900">DEDE E-Service</h1>
-                <p className="text-sm text-gray-500">ระบบบริการอิเล็กทรอนิกส์</p>
+            </div>
+            
+            {/* Login Form Container */}
+            <div className="bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+              {/* Tab Headers */}
+              <div className="flex border-b border-gray-200">
+                <button
+                  onClick={() => setActiveTab('login')}
+                  className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${
+                    activeTab === 'login'
+                      ? 'text-blue-600 border-b-2 border-blue-600'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  เข้าสู่ระบบ
+                </button>
+                <button
+                  onClick={() => setActiveTab('register')}
+                  className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${
+                    activeTab === 'register'
+                      ? 'text-blue-600 border-b-2 border-blue-600'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  สมัครสมาชิก
+                </button>
+                <button
+                  onClick={() => setActiveTab('officer')}
+                  className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${
+                    activeTab === 'officer'
+                      ? 'text-green-600 border-b-2 border-green-600'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  เข้าสู่ระบบเจ้าหน้าที่ พพ.
+                </button>
+              </div>
+              
+              {/* Tab Content */}
+              <div className="p-6">
+                {activeTab === 'login' && (
+                  <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+                    {error && (
+                      <div className="rounded-md bg-red-50 border border-red-200 p-4 mb-4">
+                        <div className="flex">
+                          <div className="flex-shrink-0">
+                            <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                          <div className="ml-3">
+                            <p className="text-sm text-red-800">{error}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {success && (
+                      <div className="rounded-md bg-green-50 border border-green-200 p-4 mb-4">
+                        <div className="flex">
+                          <div className="flex-shrink-0">
+                            <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                          <div className="ml-3">
+                            <p className="text-sm text-green-800">{success}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div>
+                      <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+                        ชื่อผู้ใช้
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <svg className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <input
+                          {...register('username', { required: 'กรุณาระบุชื่อผู้ใช้' })}
+                          type="text"
+                          autoComplete="username"
+                          className="appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                          placeholder="กรอกชื่อผู้ใช้"
+                        />
+                      </div>
+                      {errors.username && (
+                        <p className="mt-1 text-sm text-red-600">{errors.username.message}</p>
+                      )}
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                        รหัสผ่าน
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <svg className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <input
+                          {...register('password', { required: 'กรุณาระบุรหัสผ่าน' })}
+                          type="password"
+                          autoComplete="current-password"
+                          className="appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                          placeholder="กรอกรหัสผ่าน"
+                        />
+                      </div>
+                      {errors.password && (
+                        <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <input
+                          id="remember-me"
+                          name="remember-me"
+                          type="checkbox"
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                          จดจำฉัน
+                        </label>
+                      </div>
+
+                      <div className="text-sm">
+                        <button
+                          type="button"
+                          onClick={() => setShowPasswordReset(true)}
+                          className="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200"
+                        >
+                          ลืมรหัสผ่าน?
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <button
+                        type="submit"
+                        disabled={isLoading}
+                        className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors duration-200"
+                      >
+                        {isLoading ? (
+                          <>
+                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            กำลังเข้าสู่ระบบ...
+                          </>
+                        ) : (
+                          'เข้าสู่ระบบ'
+                        )}
+                      </button>
+                    </div>
+                    
+                    <div className="relative mt-6">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-300" />
+                      </div>
+                      <div className="relative flex justify-center text-sm">
+                        <span className="px-2 bg-white text-gray-500">หรือ</span>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-6">
+                      <button
+                        type="button"
+                        onClick={() => setShowLoginWithOTP(true)}
+                        className="w-full flex justify-center py-3 px-4 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                      >
+                        <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                        เข้าสู่ระบบด้วย OTP
+                      </button>
+                    </div>
+                  </form>
+                )}
+                
+                {activeTab === 'register' && (
+                  <form className="space-y-4" onSubmit={handleRegisterSubmit(onRegisterSubmit)}>
+                    {registrationError && (
+                      <div className="rounded-md bg-red-50 border border-red-200 p-4 mb-4">
+                        <div className="flex">
+                          <div className="flex-shrink-0">
+                            <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                          <div className="ml-3">
+                            <p className="text-sm text-red-800">{registrationError}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div>
+                      <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
+                        ชื่อ-นามสกุล
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <svg className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <input
+                          {...registerForm('fullName')}
+                          type="text"
+                          className="appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                          placeholder="กรอกชื่อและนามสกุลของคุณ"
+                        />
+                      </div>
+                      {registerErrors.fullName && (
+                        <p className="mt-1 text-sm text-red-600">{registerErrors.fullName.message as string}</p>
+                      )}
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                        อีเมล
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <svg className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                          </svg>
+                        </div>
+                        <input
+                          {...registerForm('email')}
+                          type="email"
+                          className="appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                          placeholder="กรอกอีเมลของคุณ"
+                        />
+                      </div>
+                      {registerErrors.email && (
+                        <p className="mt-1 text-sm text-red-600">{registerErrors.email.message as string}</p>
+                      )}
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+                        ชื่อผู้ใช้
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <svg className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <input
+                          {...registerForm('username')}
+                          type="text"
+                          className="appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                          placeholder="กรอกชื่อผู้ใช้ที่ต้องการ"
+                        />
+                      </div>
+                      {registerErrors.username && (
+                        <p className="mt-1 text-sm text-red-600">{registerErrors.username.message as string}</p>
+                      )}
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                        รหัสผ่าน
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <svg className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <input
+                          {...registerForm('password')}
+                          type="password"
+                          className="appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                          placeholder="กรอกรหัสผ่านของคุณ"
+                        />
+                      </div>
+                      {registerErrors.password && (
+                        <p className="mt-1 text-sm text-red-600">{registerErrors.password.message as string}</p>
+                      )}
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                        ยืนยันรหัสผ่าน
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <svg className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <input
+                          {...registerForm('confirmPassword')}
+                          type="password"
+                          className="appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                          placeholder="กรอกรหัสผ่านอีกครั้ง"
+                        />
+                      </div>
+                      {registerErrors.confirmPassword && (
+                        <p className="mt-1 text-sm text-red-600">{registerErrors.confirmPassword.message as string}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <button
+                        type="submit"
+                        disabled={isSubmitting || isLoading}
+                        className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors duration-200"
+                      >
+                        {isSubmitting || isLoading ? (
+                          <>
+                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            กำลังสมัครสมาชิก...
+                          </>
+                        ) : (
+                          'สมัครสมาชิก'
+                        )}
+                      </button>
+                    </div>
+                    
+                    <div className="text-center mt-4">
+                      <p className="text-sm text-gray-600">
+                        มีบัญชีอยู่แล้ว?{' '}
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab('login')}
+                          className="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200"
+                        >
+                          เข้าสู่ระบบ
+                        </button>
+                      </p>
+                    </div>
+                  </form>
+                )}
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <a href="#" className="text-gray-500 hover:text-gray-700">
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                </svg>
-              </a>
-              <a href="#" className="text-gray-500 hover:text-gray-700">
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </a>
-            </div>
+
+            {/* Officer Login Tab Content */}
+            {activeTab === 'officer' && (
+              <div className="bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden mt-6">
+                <div className="bg-gradient-to-r from-green-600 to-green-700 p-6">
+                  <div className="text-center">
+                    <div className="h-16 w-16 bg-white bg-opacity-20 rounded-xl flex items-center justify-center backdrop-blur-sm mx-auto mb-4">
+                      <svg className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-2">เข้าสู่ระบบเจ้าหน้าที่ พพ.</h3>
+                    <p className="text-green-100">สำหรับเจ้าหน้าที่ DEDE E-Service</p>
+                    <p className="text-green-200 text-sm mt-1">พัฒนาพลังงานทดแทนและอนุรักษ์พลังงาน</p>
+                  </div>
+                </div>
+                <div className="p-6">
+                  {officerSuccess && (
+                    <div className="rounded-md bg-green-50 border border-green-200 p-4 mb-4">
+                      <div className="flex">
+                        <div className="flex-shrink-0">
+                          <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <div className="ml-3">
+                          <p className="text-sm text-green-800">{officerSuccess}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {officerError && (
+                    <div className="rounded-md bg-red-50 border border-red-200 p-4 mb-4">
+                      <div className="flex">
+                        <div className="flex-shrink-0">
+                          <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <div className="ml-3">
+                          <p className="text-sm text-red-800">{officerError}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <form className="space-y-4" onSubmit={handleOfficerSubmit(onOfficerSubmit)}>
+                    <div>
+                      <label htmlFor="officer-username" className="block text-sm font-medium text-gray-700 mb-2">
+                        ชื่อผู้ใช้
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <svg className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <input
+                          {...registerOfficer('username')}
+                          type="text"
+                          autoComplete="username"
+                          className="appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
+                          placeholder="กรอกชื่อผู้ใช้เจ้าหน้าที่"
+                        />
+                      </div>
+                      {officerErrors.username && (
+                        <p className="mt-1 text-sm text-red-600">{officerErrors.username.message}</p>
+                      )}
+                    </div>
+                    <div>
+                      <label htmlFor="officer-password" className="block text-sm font-medium text-gray-700 mb-2">
+                        รหัสผ่าน
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <svg className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <input
+                          {...registerOfficer('password')}
+                          type="password"
+                          autoComplete="current-password"
+                          className="appearance-none relative block w-full pl-10 pr-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
+                          placeholder="กรอกรหัสผ่านเจ้าหน้าที่"
+                        />
+                      </div>
+                      {officerErrors.password && (
+                        <p className="mt-1 text-sm text-red-600">{officerErrors.password.message}</p>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <input
+                          id="remember-me-officer"
+                          name="remember-me"
+                          type="checkbox"
+                          className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                        />
+                        <label htmlFor="remember-me-officer" className="ml-2 block text-sm text-gray-700">
+                          จดจำฉัน
+                        </label>
+                      </div>
+
+                      <div className="text-sm">
+                        <button
+                          type="button"
+                          onClick={() => setShowPasswordReset(true)}
+                          className="font-medium text-green-600 hover:text-green-500 transition-colors duration-200"
+                        >
+                          ลืมรหัสผ่าน?
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <button
+                        type="submit"
+                        disabled={isLoading}
+                        className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 transition-all duration-200 transform hover:scale-[1.02]"
+                      >
+                        {isLoading ? (
+                          <>
+                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            กำลังเข้าสู่ระบบ...
+                          </>
+                        ) : (
+                          'เข้าสู่ระบบ'
+                        )}
+                      </button>
+                    </div>
+                    
+                    <div className="relative mt-6">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-300" />
+                      </div>
+                      <div className="relative flex justify-center text-sm">
+                        <span className="px-2 bg-white text-gray-500">หรือ</span>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-6">
+                      <button
+                        type="button"
+                        onClick={() => setShowLoginWithOTP(true)}
+                        className="w-full flex justify-center py-3 px-4 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200"
+                      >
+                        <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                        เข้าสู่ระบบด้วย OTP
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+        
+        {/* Right Side - Hero Section */}
+        <div className="w-full lg:w-1/2 bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex flex-col justify-center items-center p-8 lg:p-12">
+          <div className="max-w-lg text-center">
+            <h1 className="text-4xl font-bold mb-6">
               ระบบบริการอิเล็กทรอนิกส์
             </h1>
-            <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
+            <p className="text-xl mb-8 text-blue-100">
               กรมพัฒนาพลังงานทดแทนและอนุรักษ์พลังงาน
             </p>
+            
+            {/* Service Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6">
+                <div className="h-12 w-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mb-4">
+                  <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold mb-2">ขอรับใบอนุญาตใหม่</h3>
+                <p className="text-sm text-blue-100">สำหรับผู้ประกอบการที่ต้องการขอรับใบอนุญาตพลังงานทดแทนครั้งแรก</p>
+              </div>
+              
+              <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6">
+                <div className="h-12 w-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mb-4">
+                  <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold mb-2">ขอต่ออายุใบอนุญาต</h3>
+                <p className="text-sm text-blue-100">ต่ออายุใบอนุญาตที่กำลังจะหมดอายุ</p>
+              </div>
+              
+              <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6">
+                <div className="h-12 w-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mb-4">
+                  <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold mb-2">ขอขยายการผลิต</h3>
+                <p className="text-sm text-blue-100">ขอเพิ่มกำลังการผลิตพลังงานทดแทน</p>
+              </div>
+              
+              <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6">
+                <div className="h-12 w-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mb-4">
+                  <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold mb-2">ขอลดการผลิต</h3>
+                <p className="text-sm text-blue-100">ขอลดกำลังการผลิตพลังงานทดแทน</p>
+              </div>
+            </div>
+            
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button className="px-6 py-3 bg-white text-blue-700 font-medium rounded-lg hover:bg-blue-50 transition-colors duration-200">
                 เรียนรู้เพิ่มเติม
@@ -474,618 +1017,8 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Services Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">บริการของเรา</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              เลือกบริการที่เหมาะสมกับการใช้งานของคุณ
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-8 mb-12">
-            {/* Web View Card */}
-            <div className={`bg-white border rounded-lg shadow-md overflow-hidden transition-all duration-300 ${
-              activeTab === 'login' || activeTab === 'register'
-                ? 'ring-2 ring-blue-500 transform scale-105'
-                : 'hover:shadow-lg'
-            }`}>
-              <div className="bg-blue-600 p-6">
-                <div className="text-center">
-                  <div className="h-12 w-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center backdrop-blur-sm mx-auto mb-3">
-                    <span className="text-white font-bold text-xl">WV</span>
-                  </div>
-                  <h3 className="text-2xl font-bold text-white mb-1">Web View</h3>
-                  <p className="text-blue-100 text-sm">สำหรับผู้ขอใบอนุญาตและผู้ใช้งานทั่วไป</p>
-                </div>
-              </div>
-              
-              <div className="p-6 bg-white">
-                <ul className="space-y-2 mb-6">
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-sm text-gray-700">ขอรับใบอนุญาตใหม่</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-sm text-gray-700">ขอต่ออายุใบอนุญาต</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-sm text-gray-700">ขอขยายการผลิต</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-sm text-gray-700">ขอลดการผลิต</span>
-                  </li>
-                </ul>
-                
-                <div className="space-y-3">
-                  <button
-                    onClick={() => setActiveTab('login')}
-                    className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
-                      activeTab === 'login'
-                        ? 'bg-blue-600 text-white shadow hover:bg-blue-700'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    🚪 เข้าสู่ระบบ
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('register')}
-                    className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
-                      activeTab === 'register'
-                        ? 'bg-blue-600 text-white shadow hover:bg-blue-700'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    📝 สมัครสมาชิกใหม่
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Web Portal Card */}
-            <div className={`bg-white border rounded-lg shadow-md overflow-hidden transition-all duration-300 ${
-              activeTab === 'officer'
-                ? 'ring-2 ring-green-500 transform scale-105'
-                : 'hover:shadow-lg'
-            }`}>
-              <div className="bg-green-600 p-6">
-                <div className="text-center">
-                  <div className="h-12 w-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center backdrop-blur-sm mx-auto mb-3">
-                    <span className="text-white font-bold text-xl">WP</span>
-                  </div>
-                  <h3 className="text-2xl font-bold text-white mb-1">Web Portal</h3>
-                  <p className="text-green-100 text-sm">สำหรับเจ้าหน้าที่ DEDE E-Service</p>
-                </div>
-              </div>
-              
-              <div className="p-6 bg-white">
-                <ul className="space-y-2 mb-6">
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-sm text-gray-700">ตรวจสอบคำขอใบอนุญาต</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-sm text-gray-700">อนุมัติคำขอใบอนุญาต</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-sm text-gray-700">จัดการตารางการตรวจสอบ</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-sm text-gray-700">ออกรายงานการตรวจสอบ</span>
-                  </li>
-                </ul>
-                
-                <div className="space-y-3">
-                  <button
-                    onClick={() => setActiveTab('officer')}
-                    className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
-                      activeTab === 'officer'
-                        ? 'bg-green-600 text-white shadow hover:bg-green-700'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    👨‍💼 เข้าสู่ระบบเจ้าหน้าที่
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Login Forms Container */}
-          <div className="bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden max-w-md mx-auto">
-
-            {/* Tab Content - Web View Login */}
-            {activeTab === 'login' && (
-              <div className="max-w-md mx-auto p-8">
-                <div className="text-center mb-6">
-                  <div className="inline-flex items-center justify-center h-12 w-12 bg-blue-100 rounded-full mb-4">
-                    <span className="text-blue-600 text-xl">🚪</span>
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">เข้าสู่ระบบ Web View</h3>
-                  <p className="text-gray-600">สำหรับผู้ขอใบอนุญาตและผู้ใช้งานทั่วไป</p>
-                </div>
-                <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                  {error && (
-                    <div className="rounded-md bg-red-50 border border-red-200 p-4">
-                      <div className="flex">
-                        <div className="flex-shrink-0">
-                          <span className="text-red-400 text-lg">⚠️</span>
-                        </div>
-                        <div className="ml-3">
-                          <p className="text-sm text-red-800">{error}</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {success && (
-                    <div className="rounded-md bg-green-50 border border-green-200 p-4">
-                      <div className="flex">
-                        <div className="flex-shrink-0">
-                          <span className="text-green-400 text-lg">✅</span>
-                        </div>
-                        <div className="ml-3">
-                          <p className="text-sm text-green-800">{success}</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="rounded-md shadow-sm -space-y-px">
-                    <div>
-                      <label htmlFor="username" className="sr-only">
-                        ชื่อผู้ใช้
-                      </label>
-                      <input
-                        {...register('username', { required: 'กรุณาระบุชื่อผู้ใช้' })}
-                        type="text"
-                        autoComplete="username"
-                        className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                        placeholder="ชื่อผู้ใช้"
-                      />
-                      {errors.username && (
-                        <p className="mt-1 text-sm text-red-600">{errors.username.message}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label htmlFor="password" className="sr-only">
-                        รหัสผ่าน
-                      </label>
-                      <input
-                        {...register('password', { required: 'กรุณาระบุรหัสผ่าน' })}
-                        type="password"
-                        autoComplete="current-password"
-                        className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                        placeholder="รหัสผ่าน"
-                      />
-                      {errors.password && (
-                        <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <button
-                      type="submit"
-                      disabled={isLoading}
-                      className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
-                    >
-                      {isLoading ? (
-                        <>
-                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          กำลังเข้าสู่ระบบ...
-                        </>
-                      ) : (
-                        'เข้าสู่ระบบ'
-                      )}
-                    </button>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <div className="relative">
-                      <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-300" />
-                      </div>
-                      <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-white text-gray-500">หรือ</span>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <button
-                        type="button"
-                        onClick={() => setShowLoginWithOTP(true)}
-                        className="w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-                      >
-                        📱 เข้าสู่ระบบด้วย OTP
-                      </button>
-                      
-                      <button
-                        type="button"
-                        onClick={() => setShowPasswordReset(true)}
-                        className="w-full flex justify-center py-2 px-4 text-sm font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200"
-                      >
-                        🔑 ลืมรหัสผ่าน?
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              </div>
-            )}
-
-            {/* Tab Content - Web View Registration */}
-            {activeTab === 'register' && (
-              <div className="max-w-md mx-auto p-8">
-                <div className="text-center mb-6">
-                  <div className="inline-flex items-center justify-center h-12 w-12 bg-blue-100 rounded-full mb-4">
-                    <span className="text-blue-600 text-xl">📝</span>
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">สมัครสมาชิก Web View</h3>
-                  <p className="text-gray-600">สำหรับผู้ขอใบอนุญาตและผู้ใช้งานทั่วไป</p>
-                </div>
-                
-                {/* Registration Type Selection */}
-                <div className="space-y-4 mb-6">
-                  <div className="rounded-lg border border-gray-200 p-4 hover:border-blue-300 transition-colors bg-gray-50">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="text-lg font-medium text-gray-900">👤 บุคคลธรรมดา</h4>
-                        <p className="text-sm text-gray-600">สำหรับผู้ขอใบอนุญาตรายบุคคล</p>
-                      </div>
-                      <button
-                        onClick={() => {/* Continue with individual registration */}}
-                        className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-                      >
-                        เลือก
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="rounded-lg border border-gray-200 p-4 hover:border-blue-300 transition-colors bg-gray-50">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="text-lg font-medium text-gray-900">🏢 นิติบุคคล</h4>
-                        <p className="text-sm text-gray-600">สำหรับบริษัท ห้างหุ้นส่วน หรือองค์กร</p>
-                      </div>
-                      <button
-                        onClick={() => setShowCorporateRegistration(true)}
-                        className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-                      >
-                        เลือก
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="relative my-6">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300" />
-                  </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white text-gray-500">หรือกรอกแบบฟอร์มด้านล่าง</span>
-                  </div>
-                </div>
-                
-                {/* Individual Registration Form */}
-                <form className="space-y-4" onSubmit={handleRegisterSubmit(onRegisterSubmit)}>
-                  {registrationError && (
-                    <div className="rounded-md bg-red-50 border border-red-200 p-4">
-                      <div className="flex">
-                        <div className="flex-shrink-0">
-                          <span className="text-red-400 text-lg">⚠️</span>
-                        </div>
-                        <div className="ml-3">
-                          <p className="text-sm text-red-800">{registrationError}</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div>
-                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
-                      ชื่อ-นามสกุล
-                    </label>
-                    <input
-                      {...registerForm('fullName')}
-                      type="text"
-                      className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                      placeholder="กรอกชื่อและนามสกุลของคุณ"
-                    />
-                    {registerErrors.fullName && (
-                      <p className="mt-1 text-sm text-red-600">{registerErrors.fullName.message as string}</p>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                      อีเมล
-                    </label>
-                    <input
-                      {...registerForm('email')}
-                      type="email"
-                      className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                      placeholder="กรอกอีเมลของคุณ"
-                    />
-                    {registerErrors.email && (
-                      <p className="mt-1 text-sm text-red-600">{registerErrors.email.message as string}</p>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                      เบอร์โทรศัพท์ (ไม่จำเป็น)
-                    </label>
-                    <input
-                      {...registerForm('phone')}
-                      type="tel"
-                      className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                      placeholder="กรอกเบอร์โทรศัพท์ของคุณ"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-1">
-                      บริษัท/หน่วยงาน (ไม่จำเป็น)
-                    </label>
-                    <input
-                      {...registerForm('company')}
-                      type="text"
-                      className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                      placeholder="กรอกชื่อบริษัทหรือหน่วยงาน"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                      ชื่อผู้ใช้
-                    </label>
-                    <input
-                      {...registerForm('username')}
-                      type="text"
-                      className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                      placeholder="กรอกชื่อผู้ใช้ที่ต้องการ"
-                    />
-                    {registerErrors.username && (
-                      <p className="mt-1 text-sm text-red-600">{registerErrors.username.message as string}</p>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                      รหัสผ่าน
-                    </label>
-                    <input
-                      {...registerForm('password')}
-                      type="password"
-                      className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                      placeholder="กรอกรหัสผ่านของคุณ"
-                    />
-                    {registerErrors.password && (
-                      <p className="mt-1 text-sm text-red-600">{registerErrors.password.message as string}</p>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                      ยืนยันรหัสผ่าน
-                    </label>
-                    <input
-                      {...registerForm('confirmPassword')}
-                      type="password"
-                      className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                      placeholder="กรอกรหัสผ่านอีกครั้ง"
-                    />
-                    {registerErrors.confirmPassword && (
-                      <p className="mt-1 text-sm text-red-600">{registerErrors.confirmPassword.message as string}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <button
-                      type="submit"
-                      disabled={isSubmitting || isLoading}
-                      className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors duration-200"
-                    >
-                      {isSubmitting || isLoading ? (
-                        <>
-                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          กำลังสมัครสมาชิก...
-                        </>
-                      ) : (
-                        '📝 สมัครสมาชิก'
-                      )}
-                    </button>
-                  </div>
-                  
-                  <div className="text-center">
-                    <p className="text-sm text-gray-600">
-                      มีบัญชีอยู่แล้ว?{' '}
-                      <button
-                        type="button"
-                        onClick={() => setActiveTab('login')}
-                        className="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200"
-                      >
-                        เข้าสู่ระบบ
-                      </button>
-                    </p>
-                  </div>
-                </form>
-              </div>
-            )}
-
-            {/* Tab Content - Web Portal Login */}
-            {activeTab === 'officer' && (
-              <div className="max-w-md mx-auto p-8">
-                <div className="text-center mb-6">
-                  <div className="inline-flex items-center justify-center h-12 w-12 bg-green-100 rounded-full mb-4">
-                    <span className="text-green-600 text-xl">👨‍💼</span>
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">เข้าสู่ระบบ Web Portal</h3>
-                  <p className="text-gray-600">สำหรับเจ้าหน้าที่ DEDE E-Service เท่านั้น</p>
-                </div>
-                
-                {officerSuccess && (
-                  <div className="rounded-md bg-green-50 border border-green-200 p-4 mb-6">
-                    <div className="flex">
-                      <div className="flex-shrink-0">
-                        <span className="text-green-400 text-lg">✅</span>
-                      </div>
-                      <div className="ml-3">
-                        <p className="text-sm text-green-800">{officerSuccess}</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {officerError && (
-                  <div className="rounded-md bg-red-50 border border-red-200 p-4 mb-6">
-                    <div className="flex">
-                      <div className="flex-shrink-0">
-                        <span className="text-red-400 text-lg">⚠️</span>
-                      </div>
-                      <div className="ml-3">
-                        <p className="text-sm text-red-800">{officerError}</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                
-                <form className="space-y-6" onSubmit={handleOfficerSubmit(onOfficerSubmit)}>
-                  <div className="space-y-4">
-                    <div>
-                      <label htmlFor="officer-username" className="block text-sm font-medium text-gray-700 mb-1">
-                        ชื่อผู้ใช้
-                      </label>
-                      <input
-                        {...registerOfficer('username')}
-                        type="text"
-                        autoComplete="username"
-                        className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
-                        placeholder="กรอกชื่อผู้ใช้เจ้าหน้าที่"
-                      />
-                      {officerErrors.username && (
-                        <p className="mt-1 text-sm text-red-600">{officerErrors.username.message}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label htmlFor="officer-password" className="block text-sm font-medium text-gray-700 mb-1">
-                        รหัสผ่าน
-                      </label>
-                      <input
-                        {...registerOfficer('password')}
-                        type="password"
-                        autoComplete="current-password"
-                        className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
-                        placeholder="กรอกรหัสผ่านเจ้าหน้าที่"
-                      />
-                      {officerErrors.password && (
-                        <p className="mt-1 text-sm text-red-600">{officerErrors.password.message}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <input
-                        id="remember-me-officer"
-                        name="remember-me"
-                        type="checkbox"
-                        className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-                      />
-                      <label htmlFor="remember-me-officer" className="ml-2 block text-sm text-gray-700">
-                        จดจำฉัน
-                      </label>
-                    </div>
-
-                    <div className="text-sm">
-                      <button
-                        type="button"
-                        onClick={() => setShowPasswordReset(true)}
-                        className="font-medium text-green-600 hover:text-green-500 transition-colors duration-200"
-                      >
-                        🔑 ลืมรหัสผ่าน?
-                      </button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <button
-                      type="submit"
-                      disabled={isLoading}
-                      className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 transition-colors duration-200"
-                    >
-                      {isLoading ? (
-                        <>
-                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          กำลังเข้าสู่ระบบ...
-                        </>
-                      ) : (
-                        '👨‍💼 เข้าสู่ระบบ'
-                      )}
-                    </button>
-                  </div>
-                </form>
-
-                <div className="mt-6">
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-gray-300" />
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                      <span className="px-2 bg-white text-gray-500">หรือ</span>
-                    </div>
-                  </div>
-
-                  <div className="mt-6">
-                    <button
-                      type="button"
-                      onClick={() => setShowLoginWithOTP(true)}
-                      className="w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
-                    >
-                      📱 เข้าสู่ระบบด้วย OTP
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-          </div>
-        </div>
-      </section>
 
       {/* Features Section */}
       <section className="py-16 bg-white">
