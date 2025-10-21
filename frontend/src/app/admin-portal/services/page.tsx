@@ -7,7 +7,6 @@ import { apiClient } from '@/lib/api'
 import {
   DocumentTextIcon,
   EyeIcon,
-  PencilIcon,
   MagnifyingGlassIcon,
   FunnelIcon,
 } from '@heroicons/react/24/outline'
@@ -46,6 +45,12 @@ interface UnifiedLicenseRequest {
     full_name: string
     email: string
   }
+  status_history?: {
+    date: string
+    status: string
+    description: string
+    officer: string
+  }[]
 }
 
 export default function AdminServicesPage() {
@@ -71,7 +76,7 @@ export default function AdminServicesPage() {
   }, [searchParams])
 
   // Fetch license requests from all four tables
-  const { data: licenseRequests, isLoading } = useQuery({
+  const { data: licenseRequests, isLoading, refetch } = useQuery({
     queryKey: ['admin-license-requests', searchTerm, statusFilter, typeFilter],
     queryFn: async () => {
       const params = new URLSearchParams()
@@ -248,21 +253,23 @@ export default function AdminServicesPage() {
         <div className="bg-white shadow overflow-hidden sm:rounded-md">
           <ul className="divide-y divide-gray-200">
             {licenseRequests?.map((request) => (
-              <li key={request.id}>
+              <li key={request.id} className="hover:bg-gray-50">
                 <div className="px-4 py-4 sm:px-6">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center">
+                    <div className="flex items-center flex-1">
                       <div className="flex-shrink-0">
                         <DocumentTextIcon className="h-6 w-6 text-gray-400" />
                       </div>
-                      <div className="ml-4">
-                        <div className="flex items-center">
-                          <p className="text-sm font-medium text-gray-900">
-                            {request.title}
-                          </p>
-                          <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(request.status)}`}>
-                            {getStatusDisplayName(request.status)}
-                          </span>
+                      <div className="ml-4 flex-1">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">
+                              {request.title}
+                            </p>
+                            <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(request.status)}`}>
+                              {getStatusDisplayName(request.status)}
+                            </span>
+                          </div>
                         </div>
                         <div className="mt-1 flex items-center space-x-4">
                           <p className="text-sm text-gray-500">
@@ -281,9 +288,31 @@ export default function AdminServicesPage() {
                         <p className="mt-2 text-sm text-gray-600 line-clamp-2">
                           {request.description}
                         </p>
+                        
+                        {/* Status History Preview */}
+                        {request.status_history && request.status_history.length > 0 && (
+                          <div className="mt-3 bg-gray-50 rounded-lg p-3">
+                            <p className="text-xs font-medium text-gray-700 mb-2">ประวัติการดำเนินการล่าสุด:</p>
+                            <div className="space-y-1">
+                              {request.status_history.slice(-3).map((history, index) => (
+                                <div key={index} className="flex items-center text-xs text-gray-600">
+                                  <span className="font-medium">{new Date(history.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short' })}</span>
+                                  <span className="mx-2">•</span>
+                                  <span>{history.description}</span>
+                                  {history.officer && (
+                                    <>
+                                      <span className="mx-2">•</span>
+                                      <span className="text-gray-500">โดย {history.officer}</span>
+                                    </>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 ml-4">
                       <Link
                         href={`/admin-portal/services/${request.id}?type=${request.license_type}`}
                         className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -291,12 +320,6 @@ export default function AdminServicesPage() {
                         <EyeIcon className="h-4 w-4 mr-1" />
                         ดูรายละเอียด
                       </Link>
-                      <button
-                        className="inline-flex items-center px-3 py-1 border border-blue-300 shadow-sm text-sm leading-4 font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                      >
-                        <PencilIcon className="h-4 w-4 mr-1" />
-                        จัดการ
-                      </button>
                     </div>
                   </div>
                 </div>

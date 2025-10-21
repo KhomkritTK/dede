@@ -34,6 +34,12 @@ interface LicenseRequestDetail {
     full_name: string
     email: string
   }
+  status_history?: {
+    date: string
+    status: string
+    description: string
+    officer: string
+  }[]
   // Additional fields for new license requests
   project_address?: string
   province?: string
@@ -85,9 +91,11 @@ export default function AdminServiceDetailPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-license-request', id] })
+      queryClient.invalidateQueries({ queryKey: ['admin-license-requests'] })
       // Invalidate user requests queries to update the web view
       queryClient.invalidateQueries({ queryKey: ['user-requests'] })
       alert('สถานะคำขอถูกอัปเดตเรียบร้อย')
+      router.push('/admin-portal/services')
     },
     onError: (error) => {
       alert('เกิดข้อผิดพลาดในการอัปเดตสถานะ: ' + error.message)
@@ -103,12 +111,14 @@ export default function AdminServiceDetailPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-license-request', id] })
+      queryClient.invalidateQueries({ queryKey: ['admin-license-requests'] })
       // Invalidate user requests queries to update the web view
       queryClient.invalidateQueries({ queryKey: ['user-requests'] })
       setShowAssignModal(false)
       setAssignRole('')
       setAssignReason('')
       alert('คำขอถูกมอบหมายเรียบร้อย')
+      router.push('/admin-portal/services')
     },
     onError: (error) => {
       alert('เกิดข้อผิดพลาดในการมอบหมาย: ' + error.message)
@@ -124,11 +134,13 @@ export default function AdminServiceDetailPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-license-request', id] })
+      queryClient.invalidateQueries({ queryKey: ['admin-license-requests'] })
       // Invalidate user requests queries to update the web view
       queryClient.invalidateQueries({ queryKey: ['user-requests'] })
       setShowReturnModal(false)
       setReturnReason('')
       alert('เอกสารถูกส่งกลับไปยังผู้ใช้เรียบร้อย')
+      router.push('/admin-portal/services')
     },
     onError: (error) => {
       alert('เกิดข้อผิดพลาดในการส่งเอกสารกลับ: ' + error.message)
@@ -144,11 +156,13 @@ export default function AdminServiceDetailPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-license-request', id] })
+      queryClient.invalidateQueries({ queryKey: ['admin-license-requests'] })
       // Invalidate user requests queries to update the web view
       queryClient.invalidateQueries({ queryKey: ['user-requests'] })
       setShowForwardModal(false)
       setForwardReason('')
       alert('คำขอถูกส่งต่อให้ DEDE Head เรียบร้อย')
+      router.push('/admin-portal/services')
     },
     onError: (error) => {
       alert('เกิดข้อผิดพลาดในการส่งต่อคำขอ: ' + error.message)
@@ -513,12 +527,37 @@ export default function AdminServiceDetailPage() {
                     </>
                   )}
                   
-                  <button
-                    type="button"
-                    className="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    ดูประวัติการดำเนินการ
-                  </button>
+                  <details className="w-full">
+                    <summary className="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer">
+                      ดูประวัติการดำเนินการ
+                    </summary>
+                    <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                      {request.status_history && request.status_history.length > 0 ? (
+                        <div className="space-y-2">
+                          {request.status_history.map((history, index) => (
+                            <div key={index} className="border-l-2 border-gray-300 pl-3 relative">
+                              <div className="absolute -left-2 top-0 w-4 h-4 bg-blue-500 rounded-full border-2 border-white"></div>
+                              <div className="text-xs">
+                                <p className="font-medium text-gray-900">{history.description}</p>
+                                <p className="text-gray-500 mt-1">
+                                  {new Date(history.date).toLocaleDateString('th-TH', {
+                                    day: 'numeric',
+                                    month: 'short',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                  {history.officer && ` • โดย ${history.officer}`}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-gray-500">ไม่มีประวัติการดำเนินการ</p>
+                      )}
+                    </div>
+                  </details>
                   <button
                     type="button"
                     className="w-full inline-flex justify-center items-center px-4 py-2 border border-blue-300 shadow-sm text-sm font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"

@@ -10,12 +10,12 @@ import (
 type ServiceFlowLog struct {
 	ID               uint           `json:"id" gorm:"primaryKey"`
 	LicenseRequestID uint           `json:"license_request_id" gorm:"not null;index"`
-	LicenseRequest   LicenseRequest `json:"license_request" gorm:"foreignKey:LicenseRequestID"`
 	PreviousStatus   *RequestStatus `json:"previous_status"`
 	NewStatus        RequestStatus  `json:"new_status" gorm:"not null"`
 	ChangedBy        *uint          `json:"changed_by" gorm:"index"`
 	ChangedByUser    *User          `json:"changed_by_user" gorm:"foreignKey:ChangedBy"`
 	ChangeReason     string         `json:"change_reason"`
+	LicenseType      string         `json:"license_type" gorm:"not null"` // 'new', 'renewal', 'extension', 'reduction'
 	CreatedAt        time.Time      `json:"created_at"`
 	DeletedAt        gorm.DeletedAt `json:"-" gorm:"index"`
 }

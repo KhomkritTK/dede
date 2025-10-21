@@ -9,13 +9,11 @@ import {
   HomeIcon,
   DocumentTextIcon,
   ClipboardDocumentCheckIcon,
-  ChartBarIcon,
   UserGroupIcon,
   UserIcon,
   ArrowRightOnRectangleIcon,
   Bars3Icon,
   XMarkIcon,
-  CogIcon,
 } from '@heroicons/react/24/outline'
 
 interface AdminLayoutProps {
@@ -55,22 +53,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       current: pathname.startsWith('/admin-portal/flow'),
     },
     {
-      name: 'รายงานและสถิติ',
-      href: '/admin-portal/reports',
-      icon: ChartBarIcon,
-      current: pathname.startsWith('/admin-portal/reports'),
-    },
-    {
       name: 'จัดการผู้ใช้',
       href: '/admin-portal/users',
       icon: UserGroupIcon,
       current: pathname.startsWith('/admin-portal/users'),
-    },
-    {
-      name: 'ตั้งค่าระบบ',
-      href: '/admin-portal/settings',
-      icon: CogIcon,
-      current: pathname.startsWith('/admin-portal/settings'),
     },
     {
       name: 'โปรไฟล์',

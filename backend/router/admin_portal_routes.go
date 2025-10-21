@@ -46,6 +46,7 @@ func AdminPortalRoutes(r *gin.RouterGroup, db *gorm.DB, cfg *config.Config) {
 		{
 			services.GET("/requests", adminHandler.GetAllLicenseRequests)
 			services.GET("/requests/:id", adminHandler.GetLicenseRequestDetails)
+			services.PUT("/requests/:id", adminHandler.UpdateLicenseRequest)
 			services.PUT("/requests/:id/status", adminHandler.UpdateRequestStatus)
 			services.POST("/requests/:id/assign", adminHandler.AssignRequest)
 			services.POST("/requests/:id/return", adminHandler.ReturnDocumentsToUser)

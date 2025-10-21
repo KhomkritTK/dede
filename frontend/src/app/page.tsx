@@ -312,50 +312,121 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-800 via-blue-700 to-green-600 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black opacity-10"></div>
-      <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <div className="h-16 w-16 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center backdrop-blur-sm shadow-lg">
-              <span className="text-white font-bold text-2xl">DE</span>
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="h-10 w-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">DE</span>
+                </div>
+              </div>
+              <div className="ml-4">
+                <h1 className="text-xl font-bold text-gray-900">DEDE E-Service</h1>
+                <p className="text-sm text-gray-500">ระบบบริการอิเล็กทรอนิกส์</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <a href="#" className="text-gray-500 hover:text-gray-700">
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                </svg>
+              </a>
+              <a href="#" className="text-gray-500 hover:text-gray-700">
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </a>
             </div>
           </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight mb-3">
-            <span className="block">ระบบบริการอิเล็กทรอนิกส์</span>
-            <span className="block text-green-100 mt-1">กรมพัฒนาพลังงานทดแทนและอนุรักษ์พลังงาน</span>
-          </h1>
-          <p className="text-lg text-green-50 max-w-2xl mx-auto">
-            เลือกระบบที่เหมาะสมกับการใช้งานของคุณ
-          </p>
         </div>
+      </header>
 
-        <div className="max-w-5xl mx-auto">
-          {/* System Selection Cards */}
-          <div className="grid md:grid-cols-2 gap-6 mb-8">
+      {/* Hero Section */}
+      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              ระบบบริการอิเล็กทรอนิกส์
+            </h1>
+            <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
+              กรมพัฒนาพลังงานทดแทนและอนุรักษ์พลังงาน
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button className="px-6 py-3 bg-white text-blue-700 font-medium rounded-lg hover:bg-blue-50 transition-colors duration-200">
+                เรียนรู้เพิ่มเติม
+              </button>
+              <button className="px-6 py-3 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-400 transition-colors duration-200">
+                ดาวน์โหลดแบบฟอร์ม
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">บริการของเรา</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              เลือกบริการที่เหมาะสมกับการใช้งานของคุณ
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
             {/* Web View Card */}
-            <div className={`bg-white rounded-xl shadow-2xl overflow-hidden transition-all duration-300 ${
+            <div className={`bg-white border rounded-lg shadow-md overflow-hidden transition-all duration-300 ${
               activeTab === 'login' || activeTab === 'register'
-                ? 'ring-4 ring-blue-400 ring-opacity-50 transform scale-105'
-                : 'hover:shadow-3xl hover:transform hover:scale-102'
+                ? 'ring-2 ring-blue-500 transform scale-105'
+                : 'hover:shadow-lg'
             }`}>
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6">
+              <div className="bg-blue-600 p-6">
                 <div className="text-center">
-                  <div className="h-12 w-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center backdrop-blur-sm mx-auto mb-3">
+                  <div className="h-12 w-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center backdrop-blur-sm mx-auto mb-3">
                     <span className="text-white font-bold text-xl">WV</span>
                   </div>
-                  <h2 className="text-2xl font-bold text-white mb-1">Web View</h2>
+                  <h3 className="text-2xl font-bold text-white mb-1">Web View</h3>
                   <p className="text-blue-100 text-sm">สำหรับผู้ขอใบอนุญาตและผู้ใช้งานทั่วไป</p>
                 </div>
               </div>
               
               <div className="p-6 bg-white">
+                <ul className="space-y-2 mb-6">
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm text-gray-700">ขอรับใบอนุญาตใหม่</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm text-gray-700">ขอต่ออายุใบอนุญาต</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm text-gray-700">ขอขยายการผลิต</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm text-gray-700">ขอลดการผลิต</span>
+                  </li>
+                </ul>
+                
                 <div className="space-y-3">
                   <button
                     onClick={() => setActiveTab('login')}
                     className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
                       activeTab === 'login'
-                        ? 'bg-blue-600 text-white shadow-lg hover:bg-blue-700'
+                        ? 'bg-blue-600 text-white shadow hover:bg-blue-700'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
@@ -365,63 +436,78 @@ export default function HomePage() {
                     onClick={() => setActiveTab('register')}
                     className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
                       activeTab === 'register'
-                        ? 'bg-blue-600 text-white shadow-lg hover:bg-blue-700'
+                        ? 'bg-blue-600 text-white shadow hover:bg-blue-700'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
                     📝 สมัครสมาชิกใหม่
                   </button>
                 </div>
-                
-                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                  <p className="text-xs text-blue-700 text-center">
-                    <span className="font-semibold">เหมาะสำหรับ:</span> ผู้ที่ต้องการขอรับใบอนุญาต ต่ออายุ ขยาย หรือลดการผลิต
-                  </p>
-                </div>
               </div>
             </div>
 
             {/* Web Portal Card */}
-            <div className={`bg-white rounded-xl shadow-2xl overflow-hidden transition-all duration-300 ${
+            <div className={`bg-white border rounded-lg shadow-md overflow-hidden transition-all duration-300 ${
               activeTab === 'officer'
-                ? 'ring-4 ring-green-400 ring-opacity-50 transform scale-105'
-                : 'hover:shadow-3xl hover:transform hover:scale-102'
+                ? 'ring-2 ring-green-500 transform scale-105'
+                : 'hover:shadow-lg'
             }`}>
-              <div className="bg-gradient-to-r from-green-500 to-green-600 p-6">
+              <div className="bg-green-600 p-6">
                 <div className="text-center">
-                  <div className="h-12 w-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center backdrop-blur-sm mx-auto mb-3">
+                  <div className="h-12 w-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center backdrop-blur-sm mx-auto mb-3">
                     <span className="text-white font-bold text-xl">WP</span>
                   </div>
-                  <h2 className="text-2xl font-bold text-white mb-1">Web Portal</h2>
+                  <h3 className="text-2xl font-bold text-white mb-1">Web Portal</h3>
                   <p className="text-green-100 text-sm">สำหรับเจ้าหน้าที่ DEDE E-Service</p>
                 </div>
               </div>
               
               <div className="p-6 bg-white">
+                <ul className="space-y-2 mb-6">
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm text-gray-700">ตรวจสอบคำขอใบอนุญาต</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm text-gray-700">อนุมัติคำขอใบอนุญาต</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm text-gray-700">จัดการตารางการตรวจสอบ</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm text-gray-700">ออกรายงานการตรวจสอบ</span>
+                  </li>
+                </ul>
+                
                 <div className="space-y-3">
                   <button
                     onClick={() => setActiveTab('officer')}
                     className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
                       activeTab === 'officer'
-                        ? 'bg-green-600 text-white shadow-lg hover:bg-green-700'
+                        ? 'bg-green-600 text-white shadow hover:bg-green-700'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
                     👨‍💼 เข้าสู่ระบบเจ้าหน้าที่
                   </button>
                 </div>
-                
-                <div className="mt-4 p-3 bg-green-50 rounded-lg">
-                  <p className="text-xs text-green-700 text-center">
-                    <span className="font-semibold">เหมาะสำหรับ:</span> เจ้าหน้าที่ที่ตรวจสอบและอนุมัติคำขอใบอนุญาต
-                  </p>
-                </div>
               </div>
             </div>
           </div>
 
           {/* Login Forms Container */}
-          <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
+          <div className="bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden max-w-md mx-auto">
 
             {/* Tab Content - Web View Login */}
             {activeTab === 'login' && (
@@ -889,7 +975,177 @@ export default function HomePage() {
 
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">ทำไมต้องเลือกเรา</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              ระบบบริการอิเล็กทรอนิกส์ของเรามีคุณสมบัติที่จำเป็นสำหรับการจัดการคำขอใบอนุญาตพลังงานทดแทนและอนุรักษ์พลังงาน
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">รวดเร็วและสะดวก</h3>
+              <p className="text-gray-600">ยื่นคำขอและติดตามสถานะได้ทุกที่ทุกเวลา ลดเวลาในการดำเนินการ</p>
+            </div>
+            
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">ปลอดภัยและเชื่อถือได้</h3>
+              <p className="text-gray-600">ระบบรักษาความปลอดภัยขั้นสูง รักษาข้อมูลของคุณเป็นความลับ</p>
+            </div>
+            
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                <svg className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">ติดตามได้ง่าย</h3>
+              <p className="text-gray-600">ตรวจสอบสถานะคำขอและรับแจ้งเมื่อมีการอัปเดต</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-16 bg-blue-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">สถิติของเรา</h2>
+            <p className="text-blue-100">ตัวเลขที่แสดงถึงความเชื่อมั่นของผู้ใช้งานในระบบของเรา</p>
+          </div>
+          
+          <div className="grid md:grid-cols-4 gap-8">
+            <div className="text-center">
+              <div className="text-4xl font-bold mb-2">1,200+</div>
+              <p className="text-blue-100">คำขอที่ดำเนินการ</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold mb-2">800+</div>
+              <p className="text-blue-100">ใบอนุญาตที่อนุมัติ</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold mb-2">500+</div>
+              <p className="text-blue-100">ผู้ใช้งานที่ลงทะเบียน</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold mb-2">50+</div>
+              <p className="text-blue-100">เจ้าหน้าที่ที่ทำงาน</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">ติดต่อเรา</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              มีคำถามหรือต้องการความช่วยเหลือเพิ่มเติม ติดต่อทีมงานของเราได้
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">โทรศัพท์</h3>
+              <p className="text-gray-600">02-123-4567</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">อีเมล</h3>
+              <p className="text-gray-600">info@dede.go.th</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">ที่อยู่</h3>
+              <p className="text-gray-600">กรมพัฒนาพลังงานทดแทนและอนุรักษ์พลังงาน</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-800 text-white py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div>
+              <div className="flex items-center mb-4">
+                <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center mr-2">
+                  <span className="text-white font-bold">DE</span>
+                </div>
+                <span className="text-xl font-bold">DEDE E-Service</span>
+              </div>
+              <p className="text-gray-400 text-sm">
+                ระบบบริการอิเล็กทรอนิกส์สำหรับการจัดการคำขอใบอนุญาตพลังงานทดแทนและอนุรักษ์พลังงาน
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold mb-4">บริการของเรา</h3>
+              <ul className="space-y-2 text-gray-400 text-sm">
+                <li><a href="#" className="hover:text-white">ขอรับใบอนุญาตใหม่</a></li>
+                <li><a href="#" className="hover:text-white">ขอต่ออายุใบอนุญาต</a></li>
+                <li><a href="#" className="hover:text-white">ขอขยายการผลิต</a></li>
+                <li><a href="#" className="hover:text-white">ขอลดการผลิต</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold mb-4">ข้อมูลเพิ่มเติม</h3>
+              <ul className="space-y-2 text-gray-400 text-sm">
+                <li><a href="#" className="hover:text-white">คู่มือการใช้งาน</a></li>
+                <li><a href="#" className="hover:text-white">ข้อบังคับและเงื่อนไข</a></li>
+                <li><a href="#" className="hover:text-white">นโยบายความเป็นส่วนตัว</a></li>
+                <li><a href="#" className="hover:text-white">คำถามที่พบบ่อย</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold mb-4">ติดต่อเรา</h3>
+              <ul className="space-y-2 text-gray-400 text-sm">
+                <li>โทร: 02-123-4567</li>
+                <li>อีเมล: info@dede.go.th</li>
+                <li>ที่อยู่: กรมพัฒนาพลังงานทดแทนและอนุรักษ์พลังงาน</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400 text-sm">
+            <p>&copy; 2024 กรมพัฒนาพลังงานทดแทนและอนุรักษ์พลังงาน. สงวนลิขสิทธิ์</p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

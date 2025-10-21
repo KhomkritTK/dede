@@ -244,71 +244,129 @@ export default function UserDashboardPage() {
 
   return (
     <PublicLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header section removed as requested */}
-
-        {/* Quick Actions */}
-        <div className="bg-white shadow-xl rounded-xl p-6 mb-8 transform transition-all duration-300 hover:shadow-2xl hover-lift animate-fade-in">
-          <div className="flex items-center mb-6">
-            <div className="h-8 w-8 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg flex items-center justify-center mr-3">
-              <PlusIcon className="h-5 w-5 text-white" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 font-sans">ระบบการออกใบอนุญาตผลิตพลังงานควบคุม</h2>
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Link
-              href="/eservice/dede/license/new"
-              onMouseEnter={() => setHoveredCard('new')}
-              onMouseLeave={() => setHoveredCard(null)}
-              className={`relative flex items-center justify-center px-4 py-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-lg transition-all duration-300 transform ${hoveredCard === 'new' ? 'scale-105 -translate-y-1' : ''}`}
-            >
-              <PlusIcon className="h-5 w-5 mr-2" />
-              ขอรับใบอนุญาตใหม่
-              {hoveredCard === 'new' && <ArrowRightIcon className="h-4 w-4 ml-2 animate-pulse" />}
-            </Link>
-            <Link
-              href="/eservice/dede/license/renewal"
-              onMouseEnter={() => setHoveredCard('renewal')}
-              onMouseLeave={() => setHoveredCard(null)}
-              className={`relative flex items-center justify-center px-4 py-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-lg transition-all duration-300 transform ${hoveredCard === 'renewal' ? 'scale-105 -translate-y-1' : ''}`}
-            >
-              <PlusIcon className="h-5 w-5 mr-2" />
-              ขอต่ออายุ
-              {hoveredCard === 'renewal' && <ArrowRightIcon className="h-4 w-4 ml-2 animate-pulse" />}
-            </Link>
-            <Link
-              href="/eservice/dede/license/extension"
-              onMouseEnter={() => setHoveredCard('extension')}
-              onMouseLeave={() => setHoveredCard(null)}
-              className={`relative flex items-center justify-center px-4 py-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 shadow-lg transition-all duration-300 transform ${hoveredCard === 'extension' ? 'scale-105 -translate-y-1' : ''}`}
-            >
-              <PlusIcon className="h-5 w-5 mr-2" />
-              ขอขยายการผลิต
-              {hoveredCard === 'extension' && <ArrowRightIcon className="h-4 w-4 ml-2 animate-pulse" />}
-            </Link>
-            <Link
-              href="/eservice/dede/license/reduction"
-              onMouseEnter={() => setHoveredCard('reduction')}
-              onMouseLeave={() => setHoveredCard(null)}
-              className={`relative flex items-center justify-center px-4 py-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 shadow-lg transition-all duration-300 transform ${hoveredCard === 'reduction' ? 'scale-105 -translate-y-1' : ''}`}
-            >
-              <PlusIcon className="h-5 w-5 mr-2" />
-              ขอลดการผลิต
-              {hoveredCard === 'reduction' && <ArrowRightIcon className="h-4 w-4 ml-2 animate-pulse" />}
-            </Link>
-          </div>
-        </div>
-
-        {/* Document Status Viewer */}
-        <div className="bg-white shadow-xl rounded-xl overflow-hidden transform transition-all duration-300 hover:shadow-2xl hover-lift animate-fade-in">
-          <div className="px-6 py-5 sm:p-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
-            <div className="flex items-center">
-              <div className="h-8 w-8 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg flex items-center justify-center mr-3">
-                <DocumentTextIcon className="h-5 w-5 text-white" />
+      <div className="min-h-screen bg-gray-50">
+        {/* User Dashboard Header */}
+        <header className="bg-white shadow-sm border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center py-4">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="h-10 w-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">DE</span>
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <h1 className="text-xl font-bold text-gray-900">DEDE E-Service</h1>
+                  <p className="text-sm text-gray-500">แดชบอร์ดผู้ใช้งาน</p>
+                </div>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 font-sans">สถานะเอกสาร</h3>
+              <div className="flex items-center space-x-4">
+                <div className="text-sm text-gray-700">
+                  ยินดีต้อนรับ, <span className="font-medium">{user?.fullName || portalUser?.fullName}</span>
+                </div>
+                <button className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
+        </header>
+
+        {/* Dashboard Content */}
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Welcome Section */}
+          <div className="bg-gradient-to-r from-blue-700 to-blue-900 text-white rounded-xl p-8 mb-8 shadow-lg">
+            <h2 className="text-2xl font-bold mb-2">ยินดีต้อนรับสู่ระบบบริการอิเล็กทรอนิกส์</h2>
+            <p className="text-blue-100 mb-6">จัดการคำขอใบอนุญาตพลังงานทดแทนและอนุรักษ์พลังงานของคุณได้อย่างสะดวก</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+              <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-4">
+                <div className="text-3xl font-bold mb-1">{requests?.length || 0}</div>
+                <div className="text-blue-100 text-sm">คำขอทั้งหมด</div>
+              </div>
+              <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-4">
+                <div className="text-3xl font-bold mb-1">
+                  {requests?.filter(r => r.status === 'returned').length || 0}
+                </div>
+                <div className="text-blue-100 text-sm">รอแก้ไข</div>
+              </div>
+              <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-4">
+                <div className="text-3xl font-bold mb-1">
+                  {requests?.filter(r => r.status === 'approved').length || 0}
+                </div>
+                <div className="text-blue-100 text-sm">อนุมัติแล้ว</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden mb-8">
+            <div className="px-6 py-5 sm:p-6 border-b border-gray-200 bg-gray-50">
+              <div className="flex items-center">
+                <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
+                  <PlusIcon className="h-5 w-5 text-white" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">ดำเนินการเร็ว</h3>
+              </div>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <Link
+                  href="/eservice/dede/license/new"
+                  onMouseEnter={() => setHoveredCard('new')}
+                  onMouseLeave={() => setHoveredCard(null)}
+                  className={`relative flex items-center justify-center px-4 py-4 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 hover:border-blue-300 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 ${hoveredCard === 'new' ? 'shadow-md transform -translate-y-1' : ''}`}
+                >
+                  <PlusIcon className="h-5 w-5 mr-2" />
+                  ขอรับใบอนุญาตใหม่
+                  {hoveredCard === 'new' && <ArrowRightIcon className="h-4 w-4 ml-2" />}
+                </Link>
+                <Link
+                  href="/eservice/dede/license/renewal"
+                  onMouseEnter={() => setHoveredCard('renewal')}
+                  onMouseLeave={() => setHoveredCard(null)}
+                  className={`relative flex items-center justify-center px-4 py-4 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 hover:border-blue-300 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 ${hoveredCard === 'renewal' ? 'shadow-md transform -translate-y-1' : ''}`}
+                >
+                  <PlusIcon className="h-5 w-5 mr-2" />
+                  ขอต่ออายุ
+                  {hoveredCard === 'renewal' && <ArrowRightIcon className="h-4 w-4 ml-2" />}
+                </Link>
+                <Link
+                  href="/eservice/dede/license/extension"
+                  onMouseEnter={() => setHoveredCard('extension')}
+                  onMouseLeave={() => setHoveredCard(null)}
+                  className={`relative flex items-center justify-center px-4 py-4 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 hover:border-blue-300 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 ${hoveredCard === 'extension' ? 'shadow-md transform -translate-y-1' : ''}`}
+                >
+                  <PlusIcon className="h-5 w-5 mr-2" />
+                  ขอขยายการผลิต
+                  {hoveredCard === 'extension' && <ArrowRightIcon className="h-4 w-4 ml-2" />}
+                </Link>
+                <Link
+                  href="/eservice/dede/license/reduction"
+                  onMouseEnter={() => setHoveredCard('reduction')}
+                  onMouseLeave={() => setHoveredCard(null)}
+                  className={`relative flex items-center justify-center px-4 py-4 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 hover:border-blue-300 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 ${hoveredCard === 'reduction' ? 'shadow-md transform -translate-y-1' : ''}`}
+                >
+                  <PlusIcon className="h-5 w-5 mr-2" />
+                  ขอลดการผลิต
+                  {hoveredCard === 'reduction' && <ArrowRightIcon className="h-4 w-4 ml-2" />}
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Document Status Viewer */}
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+            <div className="px-6 py-5 sm:p-6 border-b border-gray-200 bg-gray-50">
+              <div className="flex items-center">
+                <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
+                  <DocumentTextIcon className="h-5 w-5 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900">สถานะเอกสาร</h3>
+              </div>
+            </div>
           <div className="overflow-hidden">
             {requestsLoading ? (
               <div className="px-6 py-12 sm:p-6 text-center">
@@ -338,7 +396,7 @@ export default function UserDashboardPage() {
                               <div className="flex items-center space-x-2 ml-4">
                                 {request.status === 'returned' && (
                                   <Link
-                                    href={`/eservice/dede/requests/${request.id}`}
+                                    href={`/eservice/dede/requests/${request.id}?type=${request.license_type}`}
                                     className="inline-flex items-center px-3 py-2 border border-orange-300 shadow-sm text-sm leading-4 font-medium rounded-lg text-orange-700 bg-white hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors duration-200"
                                   >
                                     <PencilIcon className="h-4 w-4 mr-1" />
@@ -346,7 +404,7 @@ export default function UserDashboardPage() {
                                   </Link>
                                 )}
                                 <Link
-                                  href={`/eservice/dede/requests/${request.id}`}
+                                  href={`/eservice/dede/requests/${request.id}?type=${request.license_type}`}
                                   className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
                                 >
                                   <EyeIcon className="h-4 w-4 mr-1" />
@@ -433,6 +491,7 @@ export default function UserDashboardPage() {
           </div>
           {/* No footer link needed */}
         </div>
+      </main>
       </div>
     </PublicLayout>
   )
