@@ -303,7 +303,7 @@ export function AuthProviderComponent({ children }: { children: ReactNode }) {
 
   const refreshProfile = async () => {
     try {
-      const response = await authService.getProfile()
+      const response = await authService.getProfile('web_view')
       
       if (response.success && response.data) {
         setAuthState(prev => ({

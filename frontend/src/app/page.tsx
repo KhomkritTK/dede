@@ -116,7 +116,11 @@ export default function HomePage() {
 
   // Check if user is trying to login with wrong form
   useEffect(() => {
-    if (!isLoading && isAuthenticated && user) {
+    // Only proceed if not loading and user is authenticated
+    if (!isLoading && !isPortalLoading && (isAuthenticated || isPortalAuth)) {
+      const currentUser = user || portalUser
+      if (!currentUser) return
+      
       const officerRoles = [
         'admin', 'system_admin', 'dede_head_admin', 'dede_staff_admin', 'dede_consult_admin', 'auditor_admin',
         'dede_head', 'dede_staff', 'dede_consult', 'auditor'
@@ -142,7 +146,7 @@ export default function HomePage() {
       }
       
       // If user is an officer/admin but logged in through regular login tab
-      if (activeTab === 'login' && officerRoles.includes(user.role)) {
+      if (activeTab === 'login' && officerRoles.includes(currentUser.role)) {
         // Instead of logging out, redirect admin users to the appropriate dashboard
         setTimeout(() => {
           router.push('/admin-portal/dashboard')
@@ -151,18 +155,19 @@ export default function HomePage() {
       }
       
       // If user is a regular user but logged in through officer login tab
-      if (activeTab === 'officer' && !officerRoles.includes(user.role)) {
+      if (activeTab === 'officer' && !officerRoles.includes(currentUser.role)) {
         setTimeout(async () => {
           await logout()
+          await portalLogout()
           setOfficerError('บัญชีนี้ไม่มีสิทธิเข้าใช้งานในฐานะเจ้าหน้าที่ กรุณาใช้แท็บเข้าสู่ระบบทั่วไป')
         }, 500)
         return
       }
       
-      // Don't auto-redirect - let users choose which system to access
-      // Users can access both systems independently from this landing page
+      // For regular users on the login tab, don't auto-redirect
+      // Let them choose which system to access or stay on the landing page
     }
-  }, [isAuthenticated, isLoading, router, user, activeTab, searchParams])
+  }, [isAuthenticated, isPortalAuth, isLoading, isPortalLoading, router, user, portalUser, activeTab, searchParams, logout, portalLogout])
 
   const onSubmit = async (data: LoginFormData) => {
     setError(null)
@@ -174,10 +179,33 @@ export default function HomePage() {
     if (!result.success) {
       setError(result.message || 'Login failed')
     } else {
-      // Show success message and redirect to eservice home
+      // Show success message and redirect based on user role
       setSuccess('เข้าสู่ระบบสำเร็จแล้ว')
       setTimeout(() => {
-        router.push('/eservice/dede/home')
+        // Use the portalUser from context after successful login
+        // The context should be updated by the time this timeout executes
+        if (portalUser) {
+          const adminRoles = [
+            'admin', 'system_admin', 'dede_head_admin', 'dede_staff_admin', 'dede_consult_admin', 'auditor_admin'
+          ]
+          const officerRoles = [
+            'dede_head', 'dede_staff', 'dede_consult', 'auditor'
+          ]
+          
+          if (adminRoles.includes(portalUser.role)) {
+            // Admin users go to admin portal
+            router.push('/admin-portal/dashboard')
+          } else if (officerRoles.includes(portalUser.role)) {
+            // Officer users go to officer dashboard
+            router.push('/eservice/dede/officer/dashboard')
+          } else {
+            // Regular users go to eservice home
+            router.push('/eservice/dede/home')
+          }
+        } else {
+          // Fallback to eservice home
+          router.push('/eservice/dede/home')
+        }
       }, 1000)
     }
   }
@@ -216,27 +244,73 @@ export default function HomePage() {
       // Show success message and redirect
       setOfficerSuccess('เข้าสู่ระบบสำเร็จแล้ว')
       
-      // Check for redirect parameter
-      const redirectParam = searchParams.get('redirect')
-      if (redirectParam === 'web-view') {
-        setTimeout(() => {
+      setTimeout(() => {
+        // Check for redirect parameter first
+        const redirectParam = searchParams.get('redirect')
+        if (redirectParam === 'web-view') {
           router.push('/eservice/dede/home')
-        }, 1000)
-      } else if (redirectParam === 'web-view/admin-portal') {
-        setTimeout(() => {
+          return
+        } else if (redirectParam === 'web-view/admin-portal') {
           router.push('/admin-portal')
-        }, 1000)
-      } else {
-        setTimeout(() => {
+          return
+        }
+        
+        // Otherwise, redirect based on user role
+        if (portalUser) {
+          const adminRoles = [
+            'admin', 'system_admin', 'dede_head_admin', 'dede_staff_admin', 'dede_consult_admin', 'auditor_admin'
+          ]
+          const officerRoles = [
+            'dede_head', 'dede_staff', 'dede_consult', 'auditor'
+          ]
+          
+          if (adminRoles.includes(portalUser.role)) {
+            // Admin users go to admin portal
+            router.push('/admin-portal/dashboard')
+          } else if (officerRoles.includes(portalUser.role)) {
+            // Officer users go to officer dashboard
+            router.push('/eservice/dede/officer/dashboard')
+          } else {
+            // Regular users go to eservice home
+            router.push('/eservice/dede/home')
+          }
+        } else {
+          // Fallback to admin portal for officer login
           router.push('/admin-portal')
-        }, 1000)
-      }
+        }
+      }, 1000)
     }
   }
 
   const handleLoginWithOTPSuccess = () => {
     setShowLoginWithOTP(false)
-    // The auth context will handle the redirect
+    // Show success message and redirect based on user role
+    setSuccess('เข้าสู่ระบบด้วย OTP สำเร็จแล้ว')
+    
+    setTimeout(() => {
+      if (portalUser) {
+        const adminRoles = [
+          'admin', 'system_admin', 'dede_head_admin', 'dede_staff_admin', 'dede_consult_admin', 'auditor_admin'
+        ]
+        const officerRoles = [
+          'dede_head', 'dede_staff', 'dede_consult', 'auditor'
+        ]
+        
+        if (adminRoles.includes(portalUser.role)) {
+          // Admin users go to admin portal
+          router.push('/admin-portal/dashboard')
+        } else if (officerRoles.includes(portalUser.role)) {
+          // Officer users go to officer dashboard
+          router.push('/eservice/dede/officer/dashboard')
+        } else {
+          // Regular users go to eservice home
+          router.push('/eservice/dede/home')
+        }
+      } else {
+        // Fallback to eservice home
+        router.push('/eservice/dede/home')
+      }
+    }, 1000)
   }
 
   const handlePasswordResetSuccess = () => {
@@ -254,8 +328,44 @@ export default function HomePage() {
 
   const handleOfficerLoginWithOTPSuccess = () => {
     setShowLoginWithOTP(false)
-    // Show success message
-    setOfficerSuccess('เข้าสู่ระบบสำเร็จแล้ว')
+    // Show success message and redirect based on user role
+    setOfficerSuccess('เข้าสู่ระบบด้วย OTP สำเร็จแล้ว')
+    
+    setTimeout(() => {
+      // Check for redirect parameter first
+      const redirectParam = searchParams.get('redirect')
+      if (redirectParam === 'web-view') {
+        router.push('/eservice/dede/home')
+        return
+      } else if (redirectParam === 'web-view/admin-portal') {
+        router.push('/admin-portal')
+        return
+      }
+      
+      // Otherwise, redirect based on user role
+      if (portalUser) {
+        const adminRoles = [
+          'admin', 'system_admin', 'dede_head_admin', 'dede_staff_admin', 'dede_consult_admin', 'auditor_admin'
+        ]
+        const officerRoles = [
+          'dede_head', 'dede_staff', 'dede_consult', 'auditor'
+        ]
+        
+        if (adminRoles.includes(portalUser.role)) {
+          // Admin users go to admin portal
+          router.push('/admin-portal/dashboard')
+        } else if (officerRoles.includes(portalUser.role)) {
+          // Officer users go to officer dashboard
+          router.push('/eservice/dede/officer/dashboard')
+        } else {
+          // Regular users go to eservice home
+          router.push('/eservice/dede/home')
+        }
+      } else {
+        // Fallback to admin portal for officer login
+        router.push('/admin-portal')
+      }
+    }, 1000)
   }
 
   const handleOfficerPasswordResetSuccess = () => {

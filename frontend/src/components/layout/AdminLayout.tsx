@@ -29,8 +29,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const handleLogout = async () => {
     await logout()
     router.push('/')
-    // Force a page refresh to ensure the main page loads with fresh state
-    window.location.href = '/'
   }
 
   const navigation = [

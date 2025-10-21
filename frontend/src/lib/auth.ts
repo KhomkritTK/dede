@@ -94,7 +94,12 @@ export class AuthService {
 
   async logout(loginType: string = 'web_view'): Promise<void> {
     try {
-      await apiClient.post('/api/v1/auth/logout')
+      // Try to call the appropriate logout endpoint based on login type
+      if (loginType === 'web_portal') {
+        await apiClient.post('/api/v1/admin-portal/auth/logout')
+      } else {
+        await apiClient.post('/api/v1/auth/logout')
+      }
     } catch (error) {
       // Even if the API call fails, we should clear local storage
       console.error('Logout API call failed:', error)
@@ -244,8 +249,18 @@ export class AuthService {
     }
   }
 
-  async getProfile(): Promise<ApiResponse<User>> {
-    return await apiClient.get<User>('/api/v1/auth/profile')
+  async getProfile(loginType: string = 'web_view'): Promise<ApiResponse<User>> {
+    // Try different endpoints based on login type
+    if (loginType === 'web_portal') {
+      try {
+        return await apiClient.get<User>('/api/v1/admin-portal/auth/profile')
+      } catch (error) {
+        // If admin portal endpoint fails, try regular endpoint
+        return await apiClient.get<User>('/api/v1/auth/profile')
+      }
+    } else {
+      return await apiClient.get<User>('/api/v1/auth/profile')
+    }
   }
 
   async updateProfile(data: Partial<User>): Promise<ApiResponse<User>> {

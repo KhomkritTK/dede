@@ -1,35 +1,40 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePortalAuth } from '@/hooks/usePortalAuth'
 
 export default function WebPortalPage() {
   const { isAuthenticated, user, isLoading } = usePortalAuth()
   const router = useRouter()
+  const hasRedirected = useRef(false)
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && !hasRedirected.current) {
       if (!isAuthenticated) {
+        hasRedirected.current = true
         router.push('/?redirect=web-portal')
         return
       }
       
       // Redirect to appropriate page based on user role
-      if (user?.role === 'admin' || 
+      if (user?.role === 'admin' ||
           user?.role === 'system_admin' ||
           user?.role === 'dede_head_admin' ||
           user?.role === 'dede_staff_admin' ||
           user?.role === 'dede_consult_admin' ||
           user?.role === 'auditor_admin') {
+        hasRedirected.current = true
         router.push('/admin-portal/dashboard')
       } else if (user?.role === 'dede_head' ||
                  user?.role === 'dede_staff' ||
                  user?.role === 'dede_consult' ||
                  user?.role === 'auditor') {
+        hasRedirected.current = true
         router.push('/eservice/dede/officer/dashboard')
       } else {
         // If user doesn't have portal access, redirect to main page
+        hasRedirected.current = true
         router.push('/?error=invalid_portal_role')
       }
     }

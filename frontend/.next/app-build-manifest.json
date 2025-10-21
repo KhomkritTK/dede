@@ -26,35 +26,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/admin-portal/dashboard/page.js"
     ],
-    "/eservice/dede/home/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/eservice/dede/home/page.js"
-    ],
     "/admin-portal/services/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/admin-portal/services/page.js"
     ],
-    "/admin-portal/users/page": [
+    "/eservice/dede/home/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin-portal/users/page.js"
-    ],
-    "/admin-portal/profile/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin-portal/profile/page.js"
-    ],
-    "/admin-portal/flow/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin-portal/flow/page.js"
-    ],
-    "/eservice/dede/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/eservice/dede/page.js"
+      "static/chunks/app/eservice/dede/home/page.js"
     ]
   }
 }

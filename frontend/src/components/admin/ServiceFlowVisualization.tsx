@@ -40,10 +40,11 @@ export default function ServiceFlowVisualization({ serviceType, compact = false 
   const { data: flowData, isLoading } = useQuery({
     queryKey: ['admin-service-flow', selectedService],
     queryFn: async () => {
-      const response = await apiClient.get<any[]>('/api/v1/admin-portal/flow/logs')
-      return response.data
+      // This endpoint doesn't exist yet, so we'll return null to avoid errors
+      // In a real implementation, you would fetch from the correct endpoint
+      return null
     },
-    enabled: !!selectedService,
+    enabled: false, // Disable this query since the endpoint doesn't exist
   })
 
   // Mock service flow data for the 4 services

@@ -354,13 +354,31 @@ export function PortalAuthProvider({ children }: { children: ReactNode }) {
   const refreshProfile = async () => {
     try {
       // Use the portal-specific getProfile method
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/v1/auth/profile`, {
+      const token = typeof window !== 'undefined' ? localStorage.getItem(PORTAL_TOKEN_KEY) : null
+      if (!token) {
+        console.warn('No token found for profile refresh')
+        return
+      }
+      
+      // Try the admin-portal profile endpoint first
+      let response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/v1/admin-portal/auth/profile`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem(PORTAL_TOKEN_KEY)}`
+          'Authorization': `Bearer ${token}`
         }
       })
+      
+      // If that fails, try the regular profile endpoint
+      if (!response.ok) {
+        response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/api/v1/auth/profile`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        })
+      }
       
       if (response.ok) {
         const data = await response.json()

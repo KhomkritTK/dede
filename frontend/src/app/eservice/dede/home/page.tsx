@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { usePortalAuth } from '@/hooks/usePortalAuth'
@@ -44,13 +44,17 @@ export default function UserDashboardPage() {
   const { user: portalUser, isAuthenticated: isPortalAuth, isLoading: isPortalLoading } = usePortalAuth()
   const router = useRouter()
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
+  const hasRedirected = useRef(false)
 
   // Redirect if not authenticated (check both auth systems)
   useEffect(() => {
+    if (hasRedirected.current) return
+    
     const isLoaded = !isLoading && !isPortalLoading
     const hasAuth = isAuthenticated || isPortalAuth
     
     if (isLoaded && !hasAuth) {
+      hasRedirected.current = true
       router.push('/')
       return
     }
@@ -58,6 +62,8 @@ export default function UserDashboardPage() {
 
   // Redirect admin users to admin portal
   useEffect(() => {
+    if (hasRedirected.current) return
+    
     const isLoaded = !isLoading && !isPortalLoading
     const currentUser = portalUser || user
     const hasAuth = isAuthenticated || isPortalAuth
@@ -69,6 +75,7 @@ export default function UserDashboardPage() {
       ]
       
       if (adminRoles.includes(currentUser.role)) {
+        hasRedirected.current = true
         router.push('/admin-portal/dashboard')
         return
       }

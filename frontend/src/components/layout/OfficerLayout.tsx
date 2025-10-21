@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useAuth } from '@/hooks/useAuth'
+import { usePortalAuth } from '@/hooks/usePortalAuth'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -22,7 +22,7 @@ interface OfficerLayoutProps {
 }
 
 export default function OfficerLayout({ children }: OfficerLayoutProps) {
-  const { user, logout } = useAuth()
+  const { user, logout } = usePortalAuth()
   const router = useRouter()
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)

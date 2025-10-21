@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePortalAuth } from '@/hooks/usePortalAuth'
 import OfficerLayout from '@/components/layout/OfficerLayout'
@@ -12,12 +12,14 @@ export default function OfficerLayoutWrapper({
 }) {
   const { user, isAuthenticated, isLoading } = usePortalAuth()
   const router = useRouter()
+  const hasRedirected = useRef(false)
 
   useEffect(() => {
     // Redirect if not authenticated or not an officer
-    if (!isLoading) {
+    if (!isLoading && !hasRedirected.current) {
       if (!isAuthenticated) {
-        router.push('/login-portal') // Redirect to officer login page
+        hasRedirected.current = true
+        router.push('/?redirect=web-portal') // Redirect to main page with portal redirect
         return
       }
       
@@ -29,6 +31,7 @@ export default function OfficerLayoutWrapper({
                        user?.role === 'auditor'
       
       if (!isOfficer) {
+        hasRedirected.current = true
         router.push('/eservice/dede') // Redirect to Web View
         return
       }
