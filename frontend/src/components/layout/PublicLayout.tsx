@@ -33,6 +33,57 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Navigation Bar */}
+      {isUserAuthenticated && (
+        <nav className="bg-white shadow-sm border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-16">
+              <div className="flex items-center">
+                <Link href="/eservice/dede/home" className="flex items-center">
+                  <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
+                    <span className="text-white font-bold text-lg">DE</span>
+                  </div>
+                  <div>
+                    <h1 className="text-xl font-bold text-gray-900">DEDE E-Service</h1>
+                    <p className="text-xs text-gray-500">ระบบบริการอิเล็กทรอนิกส์</p>
+                  </div>
+                </Link>
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-3">
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-gray-900">
+                      {currentUser?.fullName || currentUser?.username}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {currentUser?.role === 'corporate' ? 'นิติบุคคล' :
+                       currentUser?.role === 'individual' ? 'บุคคลธรรมดา' :
+                       currentUser?.role || 'ผู้ใช้งาน'}
+                    </p>
+                  </div>
+                  <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span className="text-blue-600 font-medium text-sm">
+                      {(currentUser?.fullName || currentUser?.username || 'U').charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                </div>
+                
+                <button
+                  onClick={handleLogout}
+                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200"
+                >
+                  <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  ออกจากระบบ
+                </button>
+              </div>
+            </div>
+          </div>
+        </nav>
+      )}
+      
       {/* Main content */}
       <main className="flex-1">
         {children}
