@@ -44,6 +44,8 @@ export default function UserDashboardPage() {
   const { user: portalUser, isAuthenticated: isPortalAuth, isLoading: isPortalLoading } = usePortalAuth()
   const router = useRouter()
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterStatus, setFilterStatus] = useState('all')
   const hasRedirected = useRef(false)
 
   // Redirect if not authenticated (check both auth systems)
@@ -238,12 +240,28 @@ export default function UserDashboardPage() {
     }
   }
 
+  // Filter requests based on search term and status
+  const filteredRequests = requests?.filter(request => {
+    const matchesSearch = searchTerm === '' ||
+      request.request_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      request.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      request.user.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+    
+    const matchesFilter = filterStatus === 'all' || request.status === filterStatus
+    
+    return matchesSearch && matchesFilter
+  }) || []
+
   if ((isLoading || !isAuthenticated) && (isPortalLoading || !isPortalAuth)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto"></div>
+          <div className="relative">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto"></div>
+            <div className="absolute inset-0 rounded-full h-16 w-16 border-t-4 border-transparent animate-pulse"></div>
+          </div>
           <p className="mt-4 text-gray-600 font-medium">กำลังโหลด...</p>
+          <p className="mt-2 text-sm text-gray-500">กรุณารอสักครู่</p>
         </div>
       </div>
     )
@@ -254,6 +272,118 @@ export default function UserDashboardPage() {
       <div className="min-h-screen bg-gray-50">
         {/* Dashboard Content */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Welcome Section */}
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 mb-8 shadow-xl text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold mb-2">
+                  ยินดีต้อนรับ, {portalUser?.fullName || user?.fullName || portalUser?.username || user?.username}! 👋
+                </h1>
+                <p className="text-blue-100 text-lg">
+                  จัดการคำขอใบอนุญาตพลังงานทดแทนของคุณได้อย่างสะดวกง่าย
+                </p>
+              </div>
+              <div className="hidden lg:block">
+                <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-xl p-6">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold mb-1">{requests?.length || 0}</div>
+                    <div className="text-sm text-blue-100">คำขอที่กำลังดำเนินการ</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div className="relative group">
+              <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                สร้างคำขอใบอนุญาตใหม่สำหรับธุรกิจของคุณ
+                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
+              </div>
+              <button
+                onClick={() => router.push('/eservice/dede/license/new')}
+                className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-gray-200 hover:border-green-300 group w-full"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center group-hover:bg-green-600 transition-colors">
+                    <PlusIcon className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <div className="font-semibold text-gray-900">สร้างคำขอใหม่</div>
+                    <div className="text-sm text-gray-500">เริ่มต้นใช้งาน</div>
+                  </div>
+                </div>
+              </button>
+            </div>
+            
+            <div className="relative group">
+              <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                ติดตามสถานะคำขอทั้งหมดของคุณ
+                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
+              </div>
+              <button
+                onClick={() => {
+                  const element = document.querySelector('#document-status') as HTMLElement
+                  window.scrollTo({ top: element?.offsetTop || 0, behavior: 'smooth' })
+                }}
+                className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-gray-200 hover:border-blue-300 group w-full"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center group-hover:bg-blue-600 transition-colors">
+                    <DocumentTextIcon className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <div className="font-semibold text-gray-900">ติดตามสถานะ</div>
+                    <div className="text-sm text-gray-500">ดูความคืบหน้า</div>
+                  </div>
+                </div>
+              </button>
+            </div>
+            
+            <div className="relative group">
+              <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                ต่ออายุใบอนุญาตที่กำลังจะหมดอายุ
+                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
+              </div>
+              <button
+                onClick={() => router.push('/eservice/dede/license/renewal')}
+                className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-gray-200 hover:border-orange-300 group w-full"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center group-hover:bg-orange-600 transition-colors">
+                    <ArrowRightIcon className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <div className="font-semibold text-gray-900">ต่ออายุใบอนุญาต</div>
+                    <div className="text-sm text-gray-500">ต่ออายุด่วน</div>
+                  </div>
+                </div>
+              </button>
+            </div>
+            
+            <div className="relative group">
+              <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                ดูคู่มือและข้อมูลช่วยเหลือเพิ่มเติม
+                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
+              </div>
+              <button
+                onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
+                className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-gray-200 hover:border-purple-300 group w-full"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center group-hover:bg-purple-600 transition-colors">
+                    <InformationCircleIcon className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <div className="font-semibold text-gray-900">ข้อมูลช่วยเหลือ</div>
+                    <div className="text-sm text-gray-500">คู่มือการใช้</div>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+
           {/* Services Section */}
           <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-8 mb-8 shadow-lg">
             <div className="text-center mb-8">
@@ -268,16 +398,19 @@ export default function UserDashboardPage() {
                 href="/eservice/dede/license/new"
                 onMouseEnter={() => setHoveredCard('new')}
                 onMouseLeave={() => setHoveredCard(null)}
-                className={`group bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 ${hoveredCard === 'new' ? 'transform -translate-y-2' : ''}`}
+                onFocus={() => setHoveredCard('new')}
+                onBlur={() => setHoveredCard(null)}
+                className={`group bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ${hoveredCard === 'new' ? 'transform -translate-y-2' : ''}`}
+                aria-label="ขอรับใบอนุญาตใหม่ - สำหรับผู้ประกอบการที่ต้องการขอรับใบอนุญาตพลังงานทดแทนครั้งแรก"
               >
-                <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mb-4 group-hover:bg-green-600 transition-colors">
+                <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mb-4 group-hover:bg-green-600 transition-colors" aria-hidden="true">
                   <PlusIcon className="h-6 w-6 text-white" />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">ขอรับใบอนุญาตใหม่</h3>
                 <p className="text-sm text-gray-600 mb-4">สำหรับผู้ประกอบการที่ต้องการขอรับใบอนุญาตพลังงานทดแทนครั้งแรก</p>
                 <div className="flex items-center text-green-600 font-medium text-sm">
                   ดำเนินการ
-                  <ArrowRightIcon className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRightIcon className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
                 </div>
               </Link>
               <Link
@@ -332,24 +465,101 @@ export default function UserDashboardPage() {
           </div>
 
           {/* Document Status Viewer */}
-          <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-            <div className="px-6 py-5 sm:p-6 border-b border-gray-200 bg-gray-50">
-              <div className="flex items-center">
-                <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
-                  <DocumentTextIcon className="h-5 w-5 text-white" />
+          <div id="document-status" className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+            <div className="px-6 py-5 sm:p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="h-10 w-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
+                    <DocumentTextIcon className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900">สถานะเอกสาร</h3>
+                    <p className="text-sm text-gray-600">ติดตามความคืบหน้าคำขอของคุณ</p>
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900">สถานะเอกสาร</h3>
+                <button
+                  onClick={() => refetch()}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                >
+                  <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  รีเฟรช
+                </button>
               </div>
             </div>
+            
+            {/* Search and Filter Bar */}
+            <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder="ค้นหาเลขที่คำขอ, ชื่อเรื่อง, หรือชื่อผู้ยื่น..."
+                      className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    />
+                  </div>
+                </div>
+                <div className="sm:w-48">
+                  <select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                  >
+                    <option value="all">ทุกสถานะ</option>
+                    <option value="new_request">รอตรวจสอบ</option>
+                    <option value="accepted">รับคำขอแล้ว</option>
+                    <option value="assigned">มอบหมายแล้ว</option>
+                    <option value="appointment">นัดหมาย</option>
+                    <option value="inspecting">กำลังตรวจสอบ</option>
+                    <option value="inspection_done">ตรวจสอบเสร็จ</option>
+                    <option value="document_edit">แก้ไขเอกสาร</option>
+                    <option value="report_approved">รับรองรายงาน</option>
+                    <option value="approved">อนุมัติแล้ว</option>
+                    <option value="returned">ตีกลับ</option>
+                    <option value="rejected">ปฏิเสธ</option>
+                  </select>
+                </div>
+              </div>
+              {(searchTerm || filterStatus !== 'all') && (
+                <div className="mt-3 flex items-center justify-between">
+                  <p className="text-sm text-gray-600">
+                    พบ {filteredRequests.length} รายการ {requests && requests.length !== filteredRequests.length && `จากทั้งหมด ${requests.length} รายการ`}
+                  </p>
+                  <button
+                    onClick={() => {
+                      setSearchTerm('')
+                      setFilterStatus('all')
+                    }}
+                    className="text-sm text-blue-600 hover:text-blue-500"
+                  >
+                    ล้างตัวกรอง
+                  </button>
+                </div>
+              )}
+            </div>
+            
           <div className="overflow-hidden">
             {requestsLoading ? (
               <div className="px-6 py-12 sm:p-6 text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-600 font-medium font-sans">กำลังโหลดข้อมูลเอกสาร...</p>
+                <div className="relative inline-flex justify-center items-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600"></div>
+                  <div className="absolute inset-0 rounded-full h-12 w-12 border-t-4 border-transparent animate-pulse"></div>
+                </div>
+                <p className="mt-4 text-gray-600 font-medium font-sans">กำลังโหลดข้อมูลเอกสาร...</p>
+                <p className="mt-2 text-sm text-gray-500">กำลังดึงข้อมูลล่าสุดจากระบบ</p>
               </div>
-            ) : requests && requests.length > 0 ? (
+            ) : filteredRequests.length > 0 ? (
               <ul className="divide-y divide-gray-100">
-                {requests.map((request) => (
+                {filteredRequests.map((request) => (
                   <li key={request.id} className="transform transition-all duration-200 hover:bg-blue-50 hover:shadow-md">
                     <div className="px-6 py-4 sm:px-6">
                       <div className="flex items-start justify-between">
@@ -442,6 +652,32 @@ export default function UserDashboardPage() {
                   </li>
                 ))}
               </ul>
+            ) : searchTerm || filterStatus !== 'all' ? (
+              <div className="px-6 py-12 sm:p-6 text-center">
+                <div className="mx-auto h-20 w-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                  <svg className="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="mt-4 text-lg font-medium text-gray-900 font-sans">ไม่พบรายการที่ค้นหา</h3>
+                <p className="mt-2 text-base text-gray-600 font-sans max-w-md mx-auto">
+                  ลองปรับเปลี่ยนคำค้นหาหรือตัวกรองและลองใหม่อีกครั้ง
+                </p>
+                <div className="mt-8">
+                  <button
+                    onClick={() => {
+                      setSearchTerm('')
+                      setFilterStatus('all')
+                    }}
+                    className="inline-flex items-center px-6 py-3 border border-transparent shadow-lg text-base font-medium rounded-lg text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 transform hover:scale-105"
+                  >
+                    <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    ล้างตัวกรอง
+                  </button>
+                </div>
+              </div>
             ) : (
               <div className="px-6 py-12 sm:p-6 text-center">
                 <div className="mx-auto h-20 w-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
