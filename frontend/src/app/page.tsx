@@ -203,11 +203,11 @@ export default function HomePage() {
             router.push('/eservice/dede/officer/dashboard')
           } else {
             // Regular users go to eservice home
-            router.push('eservice/dede/home')
+            window.location.href = '/eservice/dede/home'
           }
         } else {
           // Fallback to eservice home
-          router.push('eservice/dede/home')
+          window.location.href = '/eservice/dede/home'
         }
       }, 1000)
     }

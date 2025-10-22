@@ -21,7 +21,6 @@ class ApiClient {
                                config.url?.includes('/officer') ||
                                window.location.pathname.startsWith('/admin-portal') ||
                                window.location.pathname.startsWith('/eservice/dede/officer') ||
-                               window.location.pathname.startsWith('/login-portal') ||
                                window.location.pathname.startsWith('/web-portal') ||
                                window.location.pathname.startsWith('/eservice/dede')
           
@@ -49,7 +48,6 @@ class ApiClient {
             // Determine which token to use based on the current route
             const isPortalRoute = window.location.pathname.startsWith('/admin-portal') ||
                                  window.location.pathname.startsWith('/eservice/dede/officer') ||
-                                 window.location.pathname.startsWith('/login-portal') ||
                                  window.location.pathname.startsWith('/web-portal') ||
                                  window.location.pathname.startsWith('/eservice/dede')
             
@@ -90,9 +88,9 @@ class ApiClient {
             
             // Only redirect if not on authentication pages to avoid unwanted redirects
             // Don't redirect on login, home page, or register pages
-            const authPages = ['/login', '/', '/register', '/reset-password', '/invite', '/login-portal']
+            const authPages = ['/login', '/', '/register', '/reset-password', '/invite']
             if (!authPages.includes(window.location.pathname)) {
-              window.location.href = isPortalRoute ? '/login-portal' : '/'
+              window.location.href = isPortalRoute ? '/' : '/'
             }
           }
         }
