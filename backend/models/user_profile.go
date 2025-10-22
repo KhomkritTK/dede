@@ -23,6 +23,26 @@ type NotificationSettings struct {
 	Push  bool `json:"push"`
 }
 
+// Value implements the driver.Valuer interface for NotificationSettings
+func (ns NotificationSettings) Value() (driver.Value, error) {
+	return json.Marshal(ns)
+}
+
+// Scan implements the sql.Scanner interface for NotificationSettings
+func (ns *NotificationSettings) Scan(value interface{}) error {
+	if value == nil {
+		*ns = NotificationSettings{}
+		return nil
+	}
+
+	bytes, ok := value.([]byte)
+	if !ok {
+		return nil
+	}
+
+	return json.Unmarshal(bytes, ns)
+}
+
 // PrivacySettings represents user privacy preferences
 type PrivacySettings struct {
 	ProfileVisibility   string `json:"profile_visibility"` // public, members, private
@@ -31,6 +51,26 @@ type PrivacySettings struct {
 	ShowPhone           bool   `json:"show_phone"`
 	ShowAddress         bool   `json:"show_address"`
 	AllowDirectMessages bool   `json:"allow_direct_messages"`
+}
+
+// Value implements the driver.Valuer interface for PrivacySettings
+func (ps PrivacySettings) Value() (driver.Value, error) {
+	return json.Marshal(ps)
+}
+
+// Scan implements the sql.Scanner interface for PrivacySettings
+func (ps *PrivacySettings) Scan(value interface{}) error {
+	if value == nil {
+		*ps = PrivacySettings{}
+		return nil
+	}
+
+	bytes, ok := value.([]byte)
+	if !ok {
+		return nil
+	}
+
+	return json.Unmarshal(bytes, ps)
 }
 
 // UserProfile represents extended user profile information
@@ -53,9 +93,9 @@ type UserProfile struct {
 	Fax                          string               `json:"fax"`
 	ProfileImage                 string               `json:"profile_image"`
 	SignatureImage               string               `json:"signature_image"`
-	Preferences                  json.RawMessage      `json:"preferences" gorm:"type:jsonb"`
-	NotificationSettings         NotificationSettings `json:"notification_settings" gorm:"type:jsonb"`
-	PrivacySettings              PrivacySettings      `json:"privacy_settings" gorm:"type:jsonb"`
+	Preferences                  json.RawMessage      `json:"preferences"`
+	NotificationSettings         NotificationSettings `json:"notification_settings"`
+	PrivacySettings              PrivacySettings      `json:"privacy_settings"`
 	Bio                          string               `json:"bio"`
 	Website                      string               `json:"website"`
 	LinkedIn                     string               `json:"linkedin"`

@@ -40,8 +40,19 @@ func main() {
 	defer sqlDB.Close()
 
 	if *down {
-		fmt.Println("Down migrations are not implemented yet")
-		os.Exit(1)
+		fmt.Println("Dropping all tables...")
+		if err := db.Migrator().DropTable(
+			"users", "corporates", "corporate_members", "user_profiles", "otps",
+			"license_requests", "new_license_requests", "renewal_license_requests",
+			"extension_license_requests", "reduction_license_requests", "inspections",
+			"audit_reports", "attachments", "notifications", "service_flow_logs",
+			"admin_users", "task_assignments", "audit_report_versions", "workflow_comments",
+			"deadline_reminders", "role_dashboards", "workflow_metrics",
+		); err != nil {
+			log.Fatal("Failed to drop tables:", err)
+		}
+		fmt.Println("Tables dropped successfully!")
+		return
 	}
 
 	// Run migrations
