@@ -48,6 +48,30 @@ func (u *authUsecase) Login(req dto.LoginRequest) (*dto.LoginResponse, error) {
 		return nil, errors.New("invalid username or password")
 	}
 
+	// Validate user role based on login type
+	if loginType == "web_portal" {
+		// For web portal login, user must be an officer (admin or DEDE roles)
+		validOfficerRoles := []models.UserRole{
+			models.RoleAdmin,
+			models.RoleDEDEHead,
+			models.RoleDEDEStaff,
+			models.RoleDEDEConsult,
+			models.RoleAuditor,
+		}
+
+		isValidOfficer := false
+		for _, role := range validOfficerRoles {
+			if user.Role == role {
+				isValidOfficer = true
+				break
+			}
+		}
+
+		if !isValidOfficer {
+			return nil, errors.New("this account does not have officer privileges")
+		}
+	}
+
 	// Generate JWT tokens
 	accessToken, refreshToken, err := utils.GenerateTokenPair(
 		user.ID,

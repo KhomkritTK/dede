@@ -11,6 +11,7 @@ import LoginWithOTP from '@/components/auth/LoginWithOTP'
 import PasswordReset from '@/components/auth/PasswordReset'
 import CorporateRegistration from '@/components/auth/CorporateRegistration'
 import { RegisterData } from '@/types'
+import { authService } from '@/lib/auth'
 import Link from 'next/link'
 
 interface LoginFormData {
@@ -173,18 +174,20 @@ export default function HomePage() {
     setError(null)
     setSuccess(null)
     
-    // For Web View login, always use portal auth
-    const result = await portalLogin(data.username, data.password)
+    // For regular user login, use the regular auth function
+    const result = await login(data.username, data.password)
     
     if (!result.success) {
       setError(result.message || 'Login failed')
     } else {
       // Show success message and redirect based on user role
       setSuccess('เข้าสู่ระบบสำเร็จแล้ว')
+      
+      // Get user data from the result to avoid waiting for context update
+      const userData = authService.getCurrentUser()
+      
       setTimeout(() => {
-        // Use the portalUser from context after successful login
-        // The context should be updated by the time this timeout executes
-        if (portalUser) {
+        if (userData) {
           const adminRoles = [
             'admin', 'system_admin', 'dede_head_admin', 'dede_staff_admin', 'dede_consult_admin', 'auditor_admin'
           ]
@@ -192,19 +195,19 @@ export default function HomePage() {
             'dede_head', 'dede_staff', 'dede_consult', 'auditor'
           ]
           
-          if (adminRoles.includes(portalUser.role)) {
+          if (adminRoles.includes(userData.role)) {
             // Admin users go to admin portal
             router.push('/admin-portal/dashboard')
-          } else if (officerRoles.includes(portalUser.role)) {
+          } else if (officerRoles.includes(userData.role)) {
             // Officer users go to officer dashboard
             router.push('/eservice/dede/officer/dashboard')
           } else {
             // Regular users go to eservice home
-            router.push('/eservice/dede/home')
+            router.push('eservice/dede/home')
           }
         } else {
           // Fallback to eservice home
-          router.push('/eservice/dede/home')
+          router.push('eservice/dede/home')
         }
       }, 1000)
     }

@@ -13,6 +13,7 @@ type CreateNotificationRequest struct {
 	EntityType    string `json:"entity_type"`
 	EntityID      *uint  `json:"entity_id"`
 	ActionURL     string `json:"action_url"`
+	IsEmailSent   bool   `json:"is_email_sent"`
 }
 
 // GetNotificationsRequest represents a request to get notifications
@@ -54,17 +55,23 @@ type UpdateNotificationSettingsRequest struct {
 // NotificationResponse represents a notification response
 type NotificationResponse struct {
 	ID            uint       `json:"id"`
-	Title         string     `json:"title"`
-	Message       string     `json:"message"`
-	Type          string     `json:"type"`
-	Priority      string     `json:"priority"`
 	RecipientID   *uint      `json:"recipient_id"`
 	RecipientRole string     `json:"recipient_role"`
+	Type          string     `json:"type"`
+	Title         string     `json:"title"`
+	Message       string     `json:"message"`
+	Priority      string     `json:"priority"`
 	EntityType    string     `json:"entity_type"`
 	EntityID      *uint      `json:"entity_id"`
 	ActionURL     string     `json:"action_url"`
+	IsRead        bool       `json:"is_read"`
+	IsSent        bool       `json:"is_sent"`
+	IsEmailSent   bool       `json:"is_email_sent"`
 	ReadAt        *time.Time `json:"read_at"`
+	SentAt        *time.Time `json:"sent_at"`
+	EmailSentAt   *time.Time `json:"email_sent_at"`
 	CreatedAt     time.Time  `json:"created_at"`
+	UpdatedAt     time.Time  `json:"updated_at"`
 }
 
 // NotificationStatisticsResponse represents notification statistics
@@ -97,4 +104,35 @@ type StateChangeNotificationRequest struct {
 	ChangedBy   uint     `json:"changed_by" binding:"required"`
 	Recipients  []uint   `json:"recipients"`
 	Roles       []string `json:"roles"`
+}
+
+// NotificationTypeResponse represents a notification type response
+type NotificationTypeResponse struct {
+	Value string `json:"value"`
+	Label string `json:"label"`
+}
+
+// NotificationPriorityResponse represents a notification priority response
+type NotificationPriorityResponse struct {
+	Value string `json:"value"`
+	Label string `json:"label"`
+}
+
+// NotificationListResponse represents a list of notifications with pagination
+type NotificationListResponse struct {
+	Notifications []NotificationResponse `json:"notifications"`
+	Pagination    PaginationResponse     `json:"pagination"`
+}
+
+// NotificationCountResponse represents notification count
+type NotificationCountResponse struct {
+	Total  int64 `json:"total"`
+	Unread int64 `json:"unread"`
+}
+
+// PaginationResponse represents pagination information
+type PaginationResponse struct {
+	Page  int   `json:"page"`
+	Limit int   `json:"limit"`
+	Total int64 `json:"total"`
 }

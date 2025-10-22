@@ -13,12 +13,13 @@ help:
 # Build the application
 build:
 	@echo "Building application..."
-	go build -o bin/app main.go
+	go build -o bin/app ./main.go
 
 # Run the application
-run: build
+run:
 	@echo "Starting application..."
-	./bin/app
+	@lsof -ti:8080 | xargs kill -9 2>/dev/null || true
+	go run ./main.go
 
 # Run database migrations
 migrate:
@@ -46,6 +47,6 @@ dev:
 	@lsof -ti:8080 | xargs kill -9 2>/dev/null || true
 	/Users/cms-rd-1/go/bin/air
 
-run:
+run-dev:
 	@lsof -ti:8080 | xargs kill -9 2>/dev/null || true
-	go run main.go
+	go run ./main.go

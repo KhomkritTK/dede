@@ -58,7 +58,8 @@ func (u *notificationUsecase) CreateNotification(req dto.CreateNotificationReque
 		Message:       req.Message,
 		Priority:      models.NotificationPriority(req.Priority),
 		EntityType:    req.EntityType,
-		EntityID:      &req.EntityID,
+		EntityID:      req.EntityID,
+		ActionURL:     req.ActionURL,
 		IsEmailSent:   req.IsEmailSent,
 	}
 
@@ -263,11 +264,6 @@ func (u *notificationUsecase) convertToNotificationResponse(notification *models
 		recipientRole = string(*notification.RecipientRole)
 	}
 
-	entityID := uint(0)
-	if notification.EntityID != nil {
-		entityID = *notification.EntityID
-	}
-
 	return &dto.NotificationResponse{
 		ID:            notification.ID,
 		RecipientID:   notification.RecipientID,
@@ -277,7 +273,8 @@ func (u *notificationUsecase) convertToNotificationResponse(notification *models
 		Message:       notification.Message,
 		Priority:      string(notification.Priority),
 		EntityType:    notification.EntityType,
-		EntityID:      entityID,
+		EntityID:      notification.EntityID,
+		ActionURL:     notification.ActionURL,
 		IsRead:        notification.IsRead,
 		IsSent:        notification.IsSent,
 		IsEmailSent:   notification.IsEmailSent,

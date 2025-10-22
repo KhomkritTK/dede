@@ -20,7 +20,12 @@ import {
 
 export class AuthService {
   async login(credentials: LoginCredentials): Promise<ApiResponse<{ user: User; token: string }>> {
-    const response = await apiClient.post<{ user: User; access_token: string; refresh_token: string }>('/api/v1/auth/login', credentials)
+    // Ensure login_type is set to web_view for regular user login
+    const loginData = {
+      ...credentials,
+      login_type: credentials.login_type || 'web_view'
+    }
+    const response = await apiClient.post<{ user: User; access_token: string; refresh_token: string }>('/api/v1/auth/login', loginData)
     
     if (response.success && response.data) {
       // Determine storage keys based on login type

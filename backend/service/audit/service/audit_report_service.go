@@ -29,16 +29,20 @@ type AuditReportService interface {
 }
 
 type auditReportService struct {
-	db               *gorm.DB
-	notificationRepo repository.NotificationRepository
-	userRepo         repository.UserRepository
+	db                     *gorm.DB
+	notificationRepo       repository.NotificationRepository
+	userRepo               repository.UserRepository
+	auditReportRepo        repository.AuditReportRepository
+	auditReportVersionRepo repository.AuditReportVersionRepository
 }
 
 func NewAuditReportService(db *gorm.DB) AuditReportService {
 	return &auditReportService{
-		db:               db,
-		notificationRepo: repository.NewNotificationRepository(db),
-		userRepo:         repository.NewUserRepository(db),
+		db:                     db,
+		notificationRepo:       repository.NewNotificationRepository(db),
+		userRepo:               repository.NewUserRepository(db),
+		auditReportRepo:        repository.NewAuditReportRepository(db),
+		auditReportVersionRepo: repository.NewAuditReportVersionRepository(db),
 	}
 }
 
@@ -126,7 +130,7 @@ func (s *auditReportService) UpdateReport(reportID uint, req dto.UpdateReportReq
 		report.Title = req.Title
 	}
 	if req.Description != "" {
-		report.Description = req.Description
+		report.Summary = req.Description
 	}
 	if req.Status != "" {
 		report.Status = models.ReportStatus(req.Status)
@@ -206,7 +210,6 @@ func (s *auditReportService) CreateReportVersion(reportID uint, req dto.CreateRe
 	}
 
 	// Update report with new version
-	report.CurrentVersionID = &version.ID
 	report.UpdatedAt = time.Now()
 	err = s.db.Save(report).Error
 	if err != nil {
@@ -293,14 +296,14 @@ func (s *auditReportService) DeleteReportVersion(versionID uint) error {
 		return fmt.Errorf("version not found: %w", err)
 	}
 
-	// Check if this is the current version
-	report, err := s.auditReportRepo.GetByID(version.ReportID)
+	// Check if this is the latest version
+	latestVersion, err := s.auditReportVersionRepo.GetLatestVersion(version.ReportID)
 	if err != nil {
-		return fmt.Errorf("report not found: %w", err)
+		return fmt.Errorf("failed to get latest version: %w", err)
 	}
 
-	if report.CurrentVersionID != nil && *report.CurrentVersionID == versionID {
-		return fmt.Errorf("cannot delete current version")
+	if latestVersion.ID == versionID {
+		return fmt.Errorf("cannot delete latest version")
 	}
 
 	// Delete version
@@ -323,8 +326,6 @@ func (s *auditReportService) ApproveReportVersion(versionID uint, req dto.Approv
 	// Update version status
 	version.Status = models.ReportStatusApproved
 	version.ApprovedByID = &req.ApprovedByID
-	now := time.Now()
-	version.ApprovedAt = &now
 	version.ReviewComments = req.Comments
 	version.UpdatedAt = time.Now()
 
@@ -347,18 +348,16 @@ func (s *auditReportService) ApproveReportVersion(versionID uint, req dto.Approv
 	}
 
 	// Create notification for inspector
-	if version.SubmittedByID != nil {
-		s.createNotificationForUser(
-			*version.SubmittedByID,
-			"รายงานตรวจสอบได้รับการอนุมัติ",
-			fmt.Sprintf("รายงานตรวจสอบ %s ได้รับการอนุมัติแล้ว", version.Title),
-			models.NotificationType("report_approved"),
-			models.PriorityHigh,
-			"audit_report",
-			version.ID,
-			"/admin-portal/audit-reports",
-		)
-	}
+	s.createNotificationForUser(
+		version.SubmittedByID,
+		"รายงานตรวจสอบได้รับการอนุมัติ",
+		fmt.Sprintf("รายงานตรวจสอบ %s ได้รับการอนุมัติแล้ว", version.Title),
+		models.NotificationType("report_approved"),
+		models.PriorityHigh,
+		"audit_report",
+		version.ID,
+		"/admin-portal/audit-reports",
+	)
 
 	// Create notification for DEDE Head
 	s.createNotificationForRole(
@@ -395,18 +394,16 @@ func (s *auditReportService) RejectReportVersion(versionID uint, req dto.RejectR
 	}
 
 	// Create notification for inspector
-	if version.SubmittedByID != nil {
-		s.createNotificationForUser(
-			*version.SubmittedByID,
-			"รายงานตรวจสอบถูกปฏิเสธ",
-			fmt.Sprintf("รายงานตรวจสอบ %s ถูกปฏิเสธ: %s", version.Title, req.Reason),
-			models.NotificationType("report_rejected"),
-			models.PriorityHigh,
-			"audit_report",
-			version.ID,
-			"/admin-portal/audit-reports",
-		)
-	}
+	s.createNotificationForUser(
+		version.SubmittedByID,
+		"รายงานตรวจสอบถูกปฏิเสธ",
+		fmt.Sprintf("รายงานตรวจสอบ %s ถูกปฏิเสธ: %s", version.Title, req.Reason),
+		models.NotificationType("report_rejected"),
+		models.PriorityHigh,
+		"audit_report",
+		version.ID,
+		"/admin-portal/audit-reports",
+	)
 
 	return nil
 }

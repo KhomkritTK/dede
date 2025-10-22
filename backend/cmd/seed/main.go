@@ -321,7 +321,7 @@ func seedAdminUsers(db *gorm.DB) {
 	// Check if admin users already exist
 	var count int64
 	db.Model(&models.User{}).Where("role IN ?", []string{
-		"system_admin", "dede_head_admin", "dede_staff_admin", "dede_consult_admin", "auditor_admin",
+		"admin", "dede_head", "dede_staff", "dede_consult", "auditor",
 	}).Count(&count)
 
 	if count > 0 {
