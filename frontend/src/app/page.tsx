@@ -203,11 +203,11 @@ export default function HomePage() {
             router.push('/eservice/dede/officer/dashboard')
           } else {
             // Regular users go to eservice home
-            window.location.href = '/eservice/dede/home'
+            window.location.href = '/eservice/dede/home?login_success=true'
           }
         } else {
           // Fallback to eservice home
-          window.location.href = '/eservice/dede/home'
+          window.location.href = '/eservice/dede/home?login_success=true'
         }
       }, 1000)
     }
@@ -275,7 +275,7 @@ export default function HomePage() {
             router.push('/eservice/dede/officer/dashboard')
           } else {
             // Regular users go to eservice home
-            router.push('/eservice/dede/home')
+            router.push('/eservice/dede/home?login_success=true')
           }
         } else {
           // Fallback to admin portal for officer login
@@ -307,11 +307,11 @@ export default function HomePage() {
           router.push('/eservice/dede/officer/dashboard')
         } else {
           // Regular users go to eservice home
-          router.push('/eservice/dede/home')
+          router.push('/eservice/dede/home?login_success=true')
         }
       } else {
         // Fallback to eservice home
-        router.push('/eservice/dede/home')
+        router.push('/eservice/dede/home?login_success=true')
       }
     }, 1000)
   }
@@ -362,7 +362,7 @@ export default function HomePage() {
           router.push('/eservice/dede/officer/dashboard')
         } else {
           // Regular users go to eservice home
-          router.push('/eservice/dede/home')
+          router.push('/eservice/dede/home?login_success=true')
         }
       } else {
         // Fallback to admin portal for officer login

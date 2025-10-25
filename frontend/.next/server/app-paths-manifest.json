@@ -1,7 +1,4 @@
 {
-  "/not-found": "app/not-found.js",
-  "/page": "app/page.js",
   "/eservice/dede/home/page": "app/eservice/dede/home/page.js",
-  "/admin-portal/dashboard/page": "app/admin-portal/dashboard/page.js",
-  "/admin-portal/page": "app/admin-portal/page.js"
+  "/page": "app/page.js"
 }
